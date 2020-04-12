@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noodp"/>
+  <meta name="author" content="觉有情">
+  
+  
+  
+  
+  <link rel="next" href="http://jueyoq.top/2019/ddia/" />
+  <link rel="canonical" href="http://jueyoq.top/2019/linked_list/" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <title>
+       
+       
+           算法训练-链表问题 | 孙权
+       
+  </title>
+  <meta name="title" content="算法训练-链表问题 | 孙权">
+    
+  
+  <link rel="stylesheet" href="/font/iconfont.css">
+  <link rel="stylesheet" href="/css/main.min.css">
+
+
+  
+  
+ 
+
+<script type="application/ld+json">
+ "@context" : "http://schema.org",
+    "@type" : "BlogPosting",
+    "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "http://jueyoq.top"
+    },
+    "articleSection" : "posts",
+    "name" : "算法训练-链表问题",
+    "headline" : "算法训练-链表问题",
+    "description" : "力图总结出链表问题通用解决思路",
+    "inLanguage" : "en-us",
+    "author" : "觉有情",
+    "creator" : "觉有情",
+    "publisher": "觉有情",
+    "accountablePerson" : "觉有情",
+    "copyrightHolder" : "觉有情",
+    "copyrightYear" : "2019",
+    "datePublished": "2019-08-10 00:00:00 &#43;0000 UTC",
+    "dateModified" : "2019-08-10 00:00:00 &#43;0000 UTC",
+    "url" : "http://jueyoq.top/2019/linked_list/",
+    "wordCount" : "2806",
+    "keywords" : [ "leetcode", "孙权"]
+}
+</script>
+
+</head>
+
+  
+
+
+  <body class="">
+    <div class="wrapper">
+        <nav class="navbar">
+    <div class="container">
+        <div class="navbar-header header-logo">
+        	<a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://jueyoq.top">孙权</a>
+        </div>
+        <div class="menu navbar-right">
+                
+                
+                <a class="menu-item" href="/posts/" title="">Blog</a>
+                
+                <a class="menu-item" href="/categories/" title="">Categories</a>
+                
+                <a class="menu-item" href="/tags/" title="">Tags</a>
+                
+                <a class="menu-item" href="/about/" title="">About</a>
+                
+        </div>
+    </div>
+</nav>
+<nav class="navbar-mobile" id="nav-mobile" style="display: none">
+     <div class="container">
+        <div class="navbar-header">
+            <div>  <a href="javascript:void(0);" class="theme-switch"><i class="iconfont icon-xihuan"></i></a>&nbsp;<a href="http://jueyoq.top">孙权</a></div>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+     
+          <div class="menu" id="mobile-menu">
+                
+                
+                <a class="menu-item" href="/posts/" title="">Blog</a>
+                
+                <a class="menu-item" href="/categories/" title="">Categories</a>
+                
+                <a class="menu-item" href="/tags/" title="">Tags</a>
+                
+                <a class="menu-item" href="/about/" title="">About</a>
+                
+        </div>
+    </div>
+</nav>
+    	 <main class="main">
+          <div class="container">
+      		
+<article class="post-warp" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">算法训练-链表问题</h1>
+        <div class="post-meta">
+                Written by <a itemprop="name" href="http://jueyoq.top" rel="author">觉有情</a> with ♥ 
+                <span class="post-time">
+                on <time datetime=2019-08-10 itemprop="datePublished">August 10, 2019</time>
+                </span>
+                in
+                <i class="iconfont icon-folder"></i>
+                <span class="post-category">
+                        <a href="http://jueyoq.top/categories/%E7%AE%97%E6%B3%95%E8%AE%AD%E7%BB%83/"> 算法训练 </a>
+                        
+                </span>
+        </div>
+    </header>
+    <div class="post-content">
+        
+
+        
+
+        
+        
+     
+          
+          
+          
+
+          
+          
+          
+
+          <p>本篇将介绍关于链表算法的基本解体思路与经典问题,本篇不仅仅追求的是写出优秀的链表代码,更在意的是在有限时间内,如何写出<code>bug free</code>的链表代码。</p>
+
+<h2 id="链表问题的一般解题思路">链表问题的一般解题思路:</h2>
+
+<p>链表是一种利用不连续的内存块,通过在每块内存中存储下一块内存的指针而构造的线性存储结构,所以链表是线性表的一种形式。
+   链表问题是一种考察基本编码能力的问题,这类问题的特点是解法并不复杂,难点在于证明解法的正确性,以及如何编码。即,考察是否能编写出  <strong><code>bug free</code></strong>  的代码,少数会考察算法的数学证明问题。</p>
+
+<ul>
+<li>使用画图的技巧,释放一部分大脑空间。通过画出几个小规模的实例来思考问题,如果问题需要三个以上指针才能解决,那么画图的时间成本,是可以被接受的。</li>
+<li>通过画出一般情况下的案例,思考算法的主体解体思路。一般是3-5个节点的情况下。</li>
+<li>这时,更重要的是不要马上编码,而是在举出几个特殊实例,来验证一般思路在特殊场景下是否健壮,一般是0,1,2,3,4个数的链表节点,以及链表指针在头节点,与尾节点是否能正常工作。</li>
+<li>一定要有耐心，不要图快而提交代码,链表问题就是在锻炼你的代码review能力,思路很简单,难点在于耐下心来,冷静的分析。相信我,你总是能找到第一次编码中的问题。</li>
+</ul>
+
+<p><strong>那么什么是一般性的思路呢？</strong>
+这是一种模式,链表问题的算法思想就是那么几种,掌握后套用即可,数学证明看几道典型案例即可,真正的难点在于编码,链表问题是涉及指针操作,极易出错,写出 <strong><code>bug free</code></strong> 是很不容的事情,所以最重要的就是要多加练习。</p>
+
+<h2 id="1-设计单链表">1.设计单链表</h2>
+
+<p>这里利用了<a href="https://www.zhihu.com/question/27155932" rel="nofollow noreferrer" target="_blank">哨兵</a>的思想</p>
+
+<pre><code class="language-python">class MyLinkedList:
+
+    def __init__(self):
+        &quot;&quot;&quot;
+        初始化一个链表,使用一个永不存数据的节点作为哨兵,
+        这样可以简化,在插入删除操作中对头节点与尾节点插入时的条件判读,
+        进而提高速度。
+        &quot;&quot;&quot;
+        self.sb = ListNode(-1)
+        self.le = 0
+
+
+    def get(self, index):
+        &quot;&quot;&quot;
+        通过索引获取链表中的节点。
+        &quot;&quot;&quot;
+        head = self.sb.next
+        if  index &lt; 0 or index &gt;= self.le or head == None:
+            return -1
+        for i in range(index):
+            head = head.next
+        return head.val
+
+
+    def addAtHead(self, val):
+        &quot;&quot;&quot;
+        在头节点的位置插入节点,哨兵思想使其不用判读非空情况。
+        &quot;&quot;&quot;
+        head = self.sb.next
+        self.sb.next = ListNode(val)
+        self.sb.next.next = head
+        self.le += 1
+
+
+    def addAtTail(self, val):
+        &quot;&quot;&quot;
+        在尾部插入节点
+        &quot;&quot;&quot;
+        tmp = self.sb
+        for i in range(self.le):
+            tmp = tmp.next
+        tmp.next = ListNode(val)
+        self.le += 1
+
+
+    def addAtIndex(self, index, val):
+        &quot;&quot;&quot;
+        在指定索引的位置插入节点
+        &quot;&quot;&quot;
+        if  index &lt; 0 or index &gt; self.le :
+            return -1
+        pre = self.sb
+        for i in range(index):
+            pre  = pre.next
+        tmp = pre.next
+        pre.next = ListNode(val)
+        pre.next.next = tmp
+        self.le += 1
+
+
+    def deleteAtIndex(self, index):
+        &quot;&quot;&quot;
+        指定index的位置删除节点
+        &quot;&quot;&quot;
+        if index &lt; 0 or index &gt;= self.le:
+            return
+        pre = self.sb
+        for  i in range(index) :
+            pre = pre.next
+        pre.next = pre.next.next
+        self.le -= 1
+</code></pre>
+
+<h2 id="2-判断链表是否有环">2.判断链表是否有环</h2>
+
+<p>双指针思想经典三问:判读链表是否有环,链表与环的交点,求环的长度。定义两个指针,从头开始,一个每次走2步,一个走一步,二者相交则有环,不相交走两步的指针先到尾部,则判读无环。</p>
+
+<pre><code class="language-python">class Solution(object):
+    def hasCycle(self, head):
+        if head is None or head.next is None:
+            return False
+        fast ,slow = head,head
+        while fast is not  None and fast.next is not None:
+            fast = fast.next.next
+            slow = slow.next
+            if slow == fast:
+                return True
+        return False
+</code></pre>
+
+<h2 id="3-判断环的入口点">3.判断环的入口点</h2>
+
+<p>快慢指针相遇后,将快指针重新指向头节点,两个指针开始同时走,每次走一步。当再次相遇时,即是环的入口点。</p>
+
+<pre><code class="language-python">
+class Solution(object):
+    def detectCycle(self, head):
+        if head == None or head.next == None:
+            return None
+        fast = head.next.next
+        slow = head.next
+        while fast != None and fast.next != None:
+            fast = fast.next.next
+            slow = slow.next
+            if fast == slow:
+                break
+        if fast == None or fast.next == None:
+            return None
+        fast = head
+        while fast != slow:
+            fast = fast.next
+            slow = slow.next
+        return fast
+</code></pre>
+
+<h2 id="4-求解环的长度">4.求解环的长度</h2>
+
+<p>求出相遇点,一个指针继续走,每次一步,记录走的次数,另一个指针原地不动,再次相遇次数就是长度。很简单,脑补吧。</p>
+
+<pre><code class="language-python">  pass
+</code></pre>
+
+<p>那么问题来了,上述前两个算法正确吗,如何用数学证明呢？</p>
+
+<p><strong><a href="https://zhuanlan.zhihu.com/p/33663488" rel="nofollow noreferrer" target="_blank">链表有环算法证明</a>:</strong></p>
+
+<h2 id="5-求两个链表相交点">5.求两个链表相交点</h2>
+
+<p>两个指针,分别指向两个链表的头,当不断的往前走,当谁到了尾部,则回到另一个链表的头部。相交的链表,
+先到尾部的一定是短的链表,回到长链表的头部,当长链表出发的指针也到尾时,其已经走过了正好是差一步到长短链表相差的节点数,此时长链表指针回到短链表的头部,二者位置对齐,在此向前走,最终相遇,即为交点。</p>
+
+<pre><code class="language-python">class Solution(object):
+    def getIntersectionNode(self, headA, headB):
+        p1 ,p2 = headA,headB
+        while p1 != p2:
+            p1 = headB if p1 == None else p1.next
+            p2 = headA if p2 == None else p2.next
+        return p1
+</code></pre>
+
+<h2 id="6-删除单链表的第n个倒数节点">6.删除单链表的第n个倒数节点</h2>
+
+<p>两个指针,一个先走n步,然后两个指针再一起走,当先走的指针到达尾部,则后走的指针为待删除节点前驱节点。倒数第n,其实就是正数第L-n+1,L为链表长度,所以L-n正好是,要删除节点的前驱。先走n步,之后再走的就是L-n了,这样第二指针正好就是在第L-n的节点处。</p>
+
+<pre><code class="language-python">class Solution(object):
+    def removeNthFromEnd(self, head, n):
+        pre ,last = head,head
+        for i in range(n):
+            pre = pre.next
+        if pre == None:
+            return head.next
+        while pre.next != None:
+            pre = pre.next
+            last = last.next
+        last.next = last.next.next
+        return head
+</code></pre>
+
+<h2 id="7-单链表反转">7.单链表反转</h2>
+
+<p><a href="https://blog.csdn.net/feliciafay/article/details/6841115" rel="nofollow noreferrer" target="_blank">两个指针实现c版:</a></p>
+
+<pre><code class="language-python">
+class Solution(object):
+    def reverseList(self, head):
+        &quot;&quot;&quot;
+        使用三个指针,完成单链表操作。
+        &quot;&quot;&quot;
+        if head == None:
+            return None
+        pre = None
+        next = head.next
+        while head != None:
+            head.next = pre
+            pre = head
+            head = next
+            if next != None:
+                next = next.next
+        return pre
+</code></pre>
+
+<h2 id="8-移除链表中的所有值为val的元素">8.移除链表中的所有值为val的元素</h2>
+
+<p>考虑边界条件,例外情况,第一次循环是关键,通过考察0,1,2,3节点数的链表得到遍历前驱删除Val的方法,
+无法适应头节点以及头节点是连续需要删除的Val的情况。</p>
+
+<pre><code class="language-python">class Solution(object):
+    def removeElements(self, head, val):
+        if head == None:
+            return None   
+        while head != None and head.val == val:
+            if head.next == None:
+                return None
+            else:
+                head = head.next
+        pre = head
+        while pre.next != None:
+            if pre.next.val == val:
+                pre.next = pre.next.next
+            else:
+                pre = pre.next
+        return head
+</code></pre>
+
+<h2 id="9-奇偶链表">9.奇偶链表</h2>
+
+<p>通过两个指针相互next,交错前进,巧妙的实现奇偶节点的独立遍历,然后将其独自串联,并合并。
+难点在于指针关系不要搞错,可以使用画图的技巧辅助思考,链表问题考验编程实现能力,要沉得住气,耐心检查这才是关键。</p>
+
+<pre><code class="language-python">class Solution(object):
+
+    def oddEvenList(self, head):
+        if head is None:
+            return head
+        odd = head
+        even = head.next
+        if even is None:
+            return head
+        odd_prev = odd
+        even_prev = even
+        even_head = even
+        while even is not None and even.next is not None:
+            odd = even.next
+            even = odd.next
+            odd_prev.next = odd
+            even_prev.next = even
+            odd_prev = odd
+            even_prev = even
+        odd.next = even_head
+        return head
+</code></pre>
+
+<h2 id="10-回文链表">10.回文链表</h2>
+
+<p>快慢指针找到中点,将后半部分链表逆序,再次从头和中点位置遍历链表,逐一比较其值来判断回文。这里的重点是在编码过程中适当的抽象,可以简化代码逻辑,大大提高编写代码的正确性和可读性。</p>
+
+<pre><code class="language-python">class Solution(object):
+    def isPalindrome(self, head):
+        if head is None or head.next is None:
+            return True
+        mid = self.getMid(head)
+        mid.next = self.getFanZhuan(mid.next)
+        p,q = head,mid.next
+        while q is not None and p.val == q.val:
+            q = q.next
+            p = p.next
+        self.getFanZhuan(mid.next)
+        return q == None
+    def getMid(self,head):
+        fast,slow = head.next,head
+        while fast is not None and fast.next is not None:
+            fast = fast.next.next
+            slow = slow.next
+        return slow
+    def getFanZhuan(self,head):
+        if head is None or head.next is None:
+            return head
+        pre,curr,next = None,head,head.next
+        while curr is not None:
+            curr.next = pre
+            pre = curr
+            curr = next
+            next = None if next is None else next.next
+        return pre
+</code></pre>
+
+<h2 id="11-双链表设计">11.双链表设计</h2>
+
+<p>双链表的设计要比单链表还要复杂一些,但是如果领会哨兵在链表中的运用的话,那么还是很轻松的,不过这道题我居然做了3天,好吧我每天早上七点半会做一道题.总共应该花了40分钟,还是我太菜了,还有就是当设计数据结构这种题,要编写多个方法,我们在review代码时,还要考虑多个函数相互调用的影响,
+也就是类级别的“不变式”,需要深入的思考每个行为的作用,仔细理解每个行为发生的前置后置条件,以及在整个对象生命周期中都要维护的一种不变的状态是什么。</p>
+
+<pre><code class="language-python">class MyLinkedList(object):
+
+    def __init__(self):
+        &quot;&quot;&quot;
+        Initialize your data structure here.
+        &quot;&quot;&quot;
+        self.head = ListNode(-1)
+        self.tail = ListNode(-1)
+        self.head.next = self.tail
+        self.tail.prev = self.head
+        self.length = 0
+
+
+    def get(self, index):
+        &quot;&quot;&quot;
+        Get the value of the index-th node in the linked list. If the index is invalid, return -1.
+        :type index: int
+        :rtype: int
+        &quot;&quot;&quot;
+        if index &lt; 0 or index &gt;= self.length:
+            return -1
+        return self.getNode(index).val
+
+
+    def getNode(self,index):
+        frist = self.head.next
+        for i in range(index):
+            frist = frist.next
+        return frist                                                                                
+
+
+    def addAtHead(self, val):
+        &quot;&quot;&quot;
+        Add a node of value val before the first element of the linked list. After the insertion, the new node will be the first node of the linked list.
+        :type val: int
+        :rtype: void
+        &quot;&quot;&quot;
+        frist = self.head.next
+        node = ListNode(val)
+        self.head.next = node
+        node.prev = self.head
+        node.next = frist
+        frist.prev = node
+        self.length += 1
+
+
+    def addAtTail(self, val):
+        &quot;&quot;&quot;
+        Append a node of value val to the last element of the linked list.
+        :type val: int
+        :rtype: void
+        &quot;&quot;&quot;
+        last = self.tail.prev
+        node = ListNode(val)
+        self.tail.prev = node
+        node.next = self.tail
+        last.next = node
+        node.prev = last
+        self.length += 1
+
+
+    def addAtIndex(self, index, val):
+        &quot;&quot;&quot;
+        Add a node of value val before the index-th node in the linked list. If index equals to the length of linked list, the node will be appended to the end of linked list. If index is greater than the length, the node will not be inserted.
+        :type index: int
+        :type val: int
+        :rtype: void
+        &quot;&quot;&quot;
+        if index &lt; 0 or index &gt; self.length:
+            return
+        if index == self.length:
+            self.addAtTail(val)
+            return
+        old = self.getNode(index)
+        node = ListNode(val)
+        pre = old.prev
+        pre.next = node
+        node.prev = pre
+        node.next = old
+        old.prev = node
+        self.length += 1
+
+
+    def deleteAtIndex(self, index):
+        &quot;&quot;&quot;
+        Delete the index-th node in the linked list, if the index is valid.
+        :type index: int
+        :rtype: void
+        &quot;&quot;&quot;
+        if index &lt; 0 or index &gt;= self.length:
+            return
+        node = self.getNode(index)
+        pre = node.prev
+        next = node.next
+        pre.next = next
+        next.prev = pre
+        node.next = None
+        node.prev = None
+        self.length -= 1
+
+</code></pre>
+
+<h2 id="12-拼接两个有序链表">12.拼接两个有序链表</h2>
+
+<p>此题关键是对例外情况的处理,两个输入的链表可能都为空,可能长短不一。都需要单独处理</p>
+
+<pre><code class="language-python">class Solution(object):
+    def mergeTwoLists(self, l1, l2):
+        if l1 is None and l2 is None:
+            return None
+        elif l1 is None:
+            return l2
+        elif l2 is None:
+            return l1
+        sb ,headA,headB = ListNode(-1),l1,l2
+        headSB = sb
+        while headA  and  headB :
+            if headA.val &gt; headB.val:
+                sb.next = headB
+                headB = headB.next
+            elif headA.val &lt; headB.val:
+                sb.next = headA
+                headA = headA.next
+            else:
+                sb.next = headA
+                headA = headA.next
+                sb = sb.next
+                sb.next = headB
+                headB = headB.next
+            sb = sb.next
+        if headA:
+            sb.next = headA
+        elif headB:
+            sb.next = headB
+        return headSB.next
+</code></pre>
+
+<h2 id="13-将两个逆序链表表示的数字相加">13.将两个逆序链表表示的数字相加</h2>
+
+<p>此题使用哨兵简化了代码,同时注意对进位的处理,
+还是非常好做的。</p>
+
+<pre><code class="language-python">class Solution(object):
+    def addTwoNumbers(self, l1, l2):
+        rem = 0
+        dummy = ListNode(0)
+        p = dummy
+        while l1 or l2 or rem:
+            s = (l1.val if l1 else 0)  + (l2.val if l2 else 0) + rem
+            rem = s/10
+            p.next = ListNode(s%10)
+            p = p.next
+            if l1:
+                l1 = l1.next
+            if l2:
+                l2 = l2.next
+        return dummy.next
+
+</code></pre>
+
+<h2 id="14-扁平化多级双向链表">14.扁平化多级双向链表</h2>
+
+<p>具体解释看<a href="https://leetcode-cn.com/problems/flatten-a-multilevel-doubly-linked-list/description/" rel="nofollow noreferrer" target="_blank">这里</a>
+此题重点考察,对指针的处理,可以画图辅助思考,遍历链表主体,没有子链表则继续遍历。
+整个程序在一个循环内完成。有子链表则遍历子链表,得到子链表的头与尾的指针,将子链表的尾节点的next指向主体链表当前指针的next,如果此next不空,则将其prev指针指向子链表的尾节点,然后再次更新子链表的头节点,使其当前主链表遍历节点的next指针指向子链表的头节点,并且子链表头节点prev指针反过来指向它,并将其指向子孩子的指针赋值为None,将当前指针直接指向合并后子链表的尾指针的next,以此减少其遍历次数。往复迭代,具体可根据代码,画图理解。此题复杂在指针比较多,画图赋值分析,是写出<code>bug free</code>的关键。</p>
+
+<pre><code class="language-python">class Solution(object):
+        if not head:
+            return None
+        p = head
+        while p:
+            if not p.child:
+                p = p.next
+                continue
+
+            p1 = p.child
+            p2 = p.child
+            while p2.next:
+                p2 = p2.next
+
+            p2.next = p.next
+            if p.next:
+                p.next.prev = p2
+            p.next = p1
+            p1.prev = p
+            p.child = None
+            p = p1
+
+        return head
+
+</code></pre>
+
+<h2 id="15-复制带随机指针的链表">15.复制带随机指针的链表</h2>
+
+<p>此题关键是对随机指针的理解,复制节点的时候对随机指针的复制是相对的,必须保证随机指针指向的节点相对不变。详情点击<a href="https://leetcode-cn.com/problems/copy-list-with-random-pointer/description/" rel="nofollow noreferrer" target="_blank">这里</a></p>
+
+<pre><code class="language-python">class Solution(object):
+    def copyRandomList(self, head):
+        if not head:
+            return None
+        p = head
+        while p:
+            tmp = RandomListNode(p.label)
+            tmp.next = p.next
+            p.next = tmp
+            p = tmp.next
+        p = head
+        while p:
+            if p.random:
+                p.next.random = p.random.next
+            p = p.next.next
+        n,o = head.next,head
+        new = n
+        while n:
+            o.next = n.next
+            o = o.next
+            if not o:
+                break
+            n.next = o.next
+            n = n.next
+        return new
+</code></pre>
+
+<h2 id="16-旋转链表">16.旋转链表</h2>
+
+<p>此题最好的解法可以在常数空间,线性时间完成.先整体逆序,在找到分区点,对两部分分别逆序。注意的是,逆序时要指定尾指针,因为链表时连续的</p>
+
+<pre><code class="language-python">class Solution(object):
+    def rotateRight(self, head, k):
+
+        if head is None:
+            return None
+        if k == 0:
+            return head
+        count = 0
+        end = None
+        tmp = head
+        while tmp:
+            tmp = tmp.next
+            count += 1
+        head = self.nx(head,end)
+        k = k % count
+        tmp = head
+        while k != 0:
+            tmp = tmp.next
+            k -= 1
+            end = tmp
+        new_head = self.nx(head,end)
+        head.next = self.nx(end,None)
+        return new_head
+
+
+    def nx(self,head,end):
+        if head is None:
+            return None
+        pre,curr,next = None,head,head.next
+        while curr != end:
+            curr.next = pre
+            pre = curr
+            curr = next
+            next = next.next if next else None
+        return pre
+</code></pre>
+
+<h2 id="17-有序链表转换二叉搜索树">17.有序链表转换二叉搜索树</h2>
+
+<p><a href="https://leetcode-cn.com/problems/convert-sorted-list-to-binary-search-tree/description/" rel="nofollow noreferrer" target="_blank">详情</a></p>
+
+<p>此题本质就是对线性结构与树结构关系的考察,如何用线性结构存储一个二叉搜索树？有序的线性表即可,线性表可以是数组,也可以是链表。如此的话,如何用有序线性表反过来构造二叉搜索树？ 二分法是关键,二分法就是有序线性表与二叉搜索的映射关系,那么如何取二分法中点？数组可以计算index下标,链表就可以用快慢指针,ok 此时问题已经解决,请看代码。</p>
+
+<pre><code class="language-python">class Solution(object):
+    def sortedListToBST(self, head):
+        return self.insterC(head,None)
+    def insterC(self,head,tail):
+        if head is tail:
+            return None
+        if head.next is tail:
+            return TreeNode(head.val)
+        fast = mid = head
+        while fast is not tail and fast.next is not tail:
+                mid = mid.next
+                fast = fast.next.next
+        tree = TreeNode(mid.val)
+        tree.left = self.insterC(head,mid)
+        tree.right = self.insterC(mid.next,tail)
+        return tree
+
+</code></pre>
+
+<h2 id="18-两两交换链表中的节点">18.两两交换链表中的节点</h2>
+
+<p>此题类似链表逆序的思想,不过只要正确理解链表指针的关系,关注前驱,当前节点,后继三者的变换。注意检查代码,对边界条件的检查,例外情况的分析即可写出<code>bug free</code>,重点在于耐心,要有沉得住气。
+<a href="https://leetcode-cn.com/problems/swap-nodes-in-pairs/description/" rel="nofollow noreferrer" target="_blank">详情</a></p>
+
+<pre><code class="language-python">
+class Solution(object):
+    def swapPairs(self, head):
+        if head is None:
+            return head
+        sb = ListNode(-1)
+        sb.next = head
+        a = sb
+        b = head
+        c = head.next
+        while c:
+            a.next = c
+            b.next = c.next
+            c.next = b
+            a = b
+            b = b.next
+            if b is None:
+                break
+            c = b.next
+        return sb.next
+</code></pre>
+
+<h2 id="19-排序链表">19.排序链表</h2>
+
+<p>此题本质上就是对归并排序的链表实现,题目要求O(nlong),链表实现归并排序的优势就是可以在常数空间下完成归并,缺点是查询中点不能想数组一样在常数时间内完成,所以其性能上比数组形式慢一些,但也在同一数量级,并且不需要连续空间存储,以及额外空间,某些情况下也是一个不错的选择。
+<a href="https://leetcode-cn.com/problems/sort-list/description/" rel="nofollow noreferrer" target="_blank">详情</a></p>
+
+<pre><code class="language-python">class Solution(object):
+    def sortList(self, head):
+        if head is None or head.next is None :
+            return head
+
+        mid =  self.getMid(head)
+        left = self.sortList(head)
+        right = self.sortList(mid)
+        return self.merge(left,right)
+
+
+    def getMid(self,head):
+        m,k = head,head
+        sb = ListNode(-1)
+        sb.next = head
+        while k and k.next:
+            k = k.next.next
+            m = m.next
+            sb = sb.next
+        sb.next = None
+        return m
+
+
+    def merge(self,a,b):
+        sb = ListNode(-1)
+        curr = sb
+        while a and b:
+            if a.val &gt;= b.val:
+                curr.next = b
+                b = b.next
+            else:
+                curr.next = a
+                a = a.next
+            curr = curr.next
+        if a:
+            curr.next = a
+        elif b:
+            curr.next = b
+        return sb.next
+</code></pre>
+
+<h2 id="20-重排链表">20.重排链表</h2>
+
+<p><a href="https://leetcode-cn.com/problems/reorder-list/description/" rel="nofollow noreferrer" target="_blank">详情</a>
+此题关键在于正确理解题意,写几个测试用例体会一下发现其是三种常见链表行为的组合,获取链表中点,逆序链表,交叉合并链表。</p>
+
+<pre><code class="language-python">class Solution(object):
+    def reorderList(self, head):
+        if not head or not head.next:
+            return
+        if not head.next.next:
+            return
+
+        mid = self.get_mid(head)
+        head1 =  self.nx(mid)
+        head =  self.marge(head,head1)
+
+    def get_mid(self,head):
+        pre = ListNode(-1)
+        pre.next = head
+        fast,slow = head,head
+        while fast and fast.next:
+            fast = fast.next.next
+            slow = slow.next
+            pre = pre.next
+        pre.next = None
+        return slow
+
+    def nx(self,head):
+        pre, cur, next = None,head,head.next
+        while cur:
+            cur.next = pre
+            pre = cur
+            cur = next
+            if next:
+                next = next.next
+        return pre
+
+    def marge(self,head1,head2):
+        dummy = ListNode(-1)
+        d = dummy
+        p, q = head1,head2
+        while p and q:
+            d.next = p
+            p = p.next
+            d = d.next
+
+            d.next = q
+            q = q.next
+            d = d.next
+        if q:
+            d.next = q
+        elif p:
+            d.next = p
+        return dummy.next
+
+</code></pre>
+
+<h2 id="21-链表组件-https-leetcode-cn-com-problems-linked-list-components-description">21.<a href="https://leetcode-cn.com/problems/linked-list-components/description/" rel="nofollow noreferrer" target="_blank">链表组件</a></h2>
+
+<p>理解题中定义组件的概念的解题的关键,利用map key的特性以及确定计数策略即可解题,此题关键在于正确理解新概念,并识别出算法中经典的模式-集合查找。</p>
+
+<pre><code class="language-python">class Solution:
+    def numComponents(self, head, G):
+        if head is None or len(G) == 0:
+            return 0
+        count = 0
+        cur = head
+        GMap = {}
+        for v in G:
+            GMap[v] = 0
+        while cur:
+            if cur.val in GMap and (cur.next is None or cur.next.val not in GMap):
+                count += 1                
+            cur = cur.next
+        return count
+
+</code></pre>
+
+<h2 id="22-分隔链表01-https-leetcode-cn-com-problems-split-linked-list-in-parts-description">22.<a href="https://leetcode-cn.com/problems/split-linked-list-in-parts/description/" rel="nofollow noreferrer" target="_blank">分隔链表01</a></h2>
+
+<p>分成两步求解,第一找到分割规则。
+第二按规则切分。
+根据题意规则很简单,就是先平分再均摊余数
+此类问题在于找到规律,将其数学化表达并封装好操作行为。</p>
+
+<pre><code class="language-python">class Solution:
+    def splitListToParts(self, root, k):
+        p = root
+        size = 1
+        while p and p.next:
+            size += 1
+            p = p.next
+        mod = size % k
+        num = int(size / k)
+        res = []
+
+        tmp = root
+        while k != 0:
+            if mod != 0:
+                root = self.splitListNodeByLen(tmp,num+1)
+                mod -= 1
+            else:
+                root = self.splitListNodeByLen(tmp,num)
+            res.append(tmp)
+            tmp = root
+            k -= 1
+        return res
+
+
+    def splitListNodeByLen(self,root,l):
+        if not root or l &lt;= 0:
+            return root
+        pre = None
+        while l &gt; 0:
+            pre = root
+            root = root.next
+            l -= 1
+        pre.next = None
+        return root
+</code></pre>
+
+<h2 id="23-两数相加-ii-https-leetcode-cn-com-problems-add-two-numbers-ii-description">23.<a href="https://leetcode-cn.com/problems/add-two-numbers-ii/description/" rel="nofollow noreferrer" target="_blank">两数相加 II</a></h2>
+
+<p>此题是连表相加的升级版,连表不再逆序需要自行处理,解体模式即是先一般到特殊的处理方式,此题我的解法比较糟糕,没有借鉴最佳实践,只是我自己想出来的,既然无法从低位开始,又是运算问题,直接想到使用栈这种辅助结构来处理。
+但是期间引入的额外的复杂性,之后再想如何优化。</p>
+
+<pre><code class="language-python">class Solution:
+    def addTwoNumbers(self, l1, l2):
+        s1, s2 = [], []
+        tmp1 ,tmp2 = l1, l2
+        while tmp1:
+            s1.append(tmp1.val)
+            tmp1 = tmp1.next
+        while tmp2:
+            s2.append(tmp2.val)
+            tmp2 = tmp2.next
+        c = 0
+        node = ListNode(-1)
+        root = node
+        while len(s1) != 0 and len(s2) != 0:
+            num = s1[-1] + s2[-1] + c
+            s1 = s1[:len(s1)-1]
+            s2 = s2[:len(s2)-1]
+            if num &gt;= 10:
+                node.val = num - 10
+                c = 1
+            else:
+                node.val = num
+                c = 0
+            if len(s1) == 0 and len(s2) == 0:
+                if c == 1:
+                    node.next = ListNode(-1)
+                    node = node.next
+                    node.val =  c
+                break
+            node.next = ListNode(-1)
+            node = node.next
+
+        while len(s1) != 0:
+            num = s1[-1] + c
+            if num &gt;= 10:
+                node.val = num - 10
+                c = 1
+            else:
+                node.val = num
+                c = 0
+            s1 = s1[:len(s1)-1]
+            if len(s1) == 0:
+                if c == 1:
+                    node.next = ListNode(-1)
+                    node = node.next
+                    node.val = c
+                break
+            node.next = ListNode(-1)
+            node = node.next
+
+        while len(s2) != 0:
+            num = s2[-1] + c
+            if num &gt;= 10:
+                node.val = num - 10
+                c = 1
+            else:
+                node.val = num
+                c = 0
+            s2 = s2[:len(s2)-1]
+            if len(s2) == 0:
+                if c == 1:
+                    node.next = ListNode(-1)
+                    node = node.next
+                    node.val = c
+                break
+            node.next = ListNode(-1)
+            node = node.next
+        return self.nx(root)
+
+    def nx(self,root):
+        if root is None:
+            return None
+        pre = None
+        next = root.next
+        while root:
+            root.next = pre
+            pre = root
+            root = next
+            if next:
+                next = next.next
+        return pre
+</code></pre>
+
+<h2 id="24-分隔链表02-https-leetcode-cn-com-problems-partition-list-description">24.<a href="https://leetcode-cn.com/problems/partition-list/description/" rel="nofollow noreferrer" target="_blank">分隔链表02</a></h2>
+
+<p>此题是 快排分区中的连表实现。</p>
+
+<pre><code class="language-python">class Solution:
+    def partition(self, head, x):
+        h1,h2 = ListNode(-1),ListNode(-1)
+        dummy = ListNode(-1)
+        dummy.next = head
+        pre = dummy
+        tmp1,tmp2 = h1,h2
+        while pre and pre.next:
+            tmp = pre.next
+            pre.next = None
+            pre = tmp
+            if tmp.val &gt;= x:
+                tmp1.next = tmp
+                tmp1 = tmp1.next
+            else:
+                tmp2.next = tmp
+                tmp2 = tmp2.next
+        tmp2.next = h1.next
+        return h2.next
+</code></pre>
+
+<h2 id="25-反转链表-ii-https-leetcode-cn-com-problems-reverse-linked-list-ii-description">25.<a href="https://leetcode-cn.com/problems/reverse-linked-list-ii/description/" rel="nofollow noreferrer" target="_blank">反转链表 II</a></h2>
+
+<p>此题指针较多画图辅助更加高效。</p>
+
+<pre><code class="language-python">class Solution:
+    def reverseBetween(self, head, m, n):
+        count = 0
+        dummy = ListNode(-1)
+        pre = dummy
+        pre.next = head
+        while count &lt; m-1:
+            pre = pre.next
+            count += 1
+        last = pre
+        while count &lt; n:
+            last = last.next
+            count += 1
+        cur = pre.next
+        next = last.next
+        self.reverse(cur, last)
+        pre.next = last
+        head = dummy.next
+        cur.next = next
+        return head
+    def reverse(self, cur,last):
+        last.next = None;
+        pre = None
+        next = cur.next
+        while cur:
+            cur.next = pre
+            pre = cur
+            cur = next
+            if next:
+                next = next.next
+</code></pre>
+
+<h2 id="26-两数相加">26.两数相加</h2>
+
+<p>运用哨兵模式</p>
+
+<pre><code class="language-python">class Solution(object):
+    def addTwoNumbers(self, l1, l2):
+        &quot;&quot;&quot;
+
+        &quot;&quot;&quot;
+        rem = 0
+        dummy = ListNode(0)
+        p = dummy
+        while l1 or l2 or rem:
+            s = (l1.val if l1 else 0)  + (l2.val if l2 else 0) + rem
+            rem = s/10
+            p.next = ListNode(s%10)
+            p = p.next
+            if l1:
+                l1 = l1.next
+            if l2:
+                l2 = l2.next
+        return dummy.next
+</code></pre>
+
+<h2 id="27-plus-one-linked-list-连表加1运算">27.Plus One Linked List(连表加1运算)</h2>
+
+<p>leetCode付费题,很简单但很巧妙。不是我想的<a href="http://www.cnblogs.com/grandyang/p/5626389.html" rel="nofollow noreferrer" target="_blank">原文</a>
+思路是遍历链表，找到右起第一个不为9的数字，如果找不到这样的数字，说明所有数字均为9，那么在表头新建一个值为0的新节点，进行加1处理，然后把右边所有的数字都置为0即可。举例来说：
+比如1-&gt;2-&gt;3，那么第一个不为9的数字为3，对3进行加1，变成4，右边没有节点了，所以不做处理，返回1-&gt;2-&gt;4。
+再比如说8-&gt;9-&gt;9，找第一个不为9的数字为8，进行加1处理变成了9，然后把后面的数字都置0，得到结果9-&gt;0-&gt;0。
+再来看9-&gt;9-&gt;9的情况，找不到不为9的数字，那么再前面新建一个值为0的节点，进行加1处理变成了1，把后面的数字都置0，得到1-&gt;0-&gt;0-&gt;0。</p>
+
+<pre><code class="language-go">class Solution {
+public:
+    ListNode* plusOne(ListNode* head) {
+        ListNode *cur = head, *right = NULL;
+        while (cur) {
+            if (cur-&gt;val != 9) right = cur;
+            cur = cur-&gt;next;
+        }
+        if (!right) {
+            right = new ListNode(0);
+            right-&gt;next = head;
+            head = right;
+        }
+        ++right-&gt;val;
+        cur = right-&gt;next;
+        while (cur) {
+            cur-&gt;val = 0;
+            cur = cur-&gt;next;
+        }
+        return head;
+    }
+};
+</code></pre>
+
+<h2 id="28-design-phone-directory-设计电话字典">28.Design Phone Directory（设计电话字典)</h2>
+
+<p><a href="http://www.cnblogs.com/grandyang/p/5735205.html" rel="nofollow noreferrer" target="_blank">这里</a>,讲的很清楚,不用我再说了,主要考察数据结构的设计,事实上,这种问题先根据经验想最常见的结构是否可以满足要求,不足则尝试组合数据结构,关键是定义你要知道哪些信息才能使你离正确答案更近一步,这需要练习与总结。</p>
+
+<h2 id="9-convert-binary-search-tree-to-sorted-doubly-linked-list">9.Convert Binary Search Tree to Sorted Doubly Linked List</h2>
+
+<p>将一颗二叉搜索树,转换为一个循环双连表。
+非常经典的一道题,LeetCode收费,没办法OJ做,本地只有go的环境。所以用go写了个解。
+此题利用分治思想,递归实现。原问题的模式可以看成:左子树成环 与 根成环合并,再与右子树成环合并。如此,子问题就是: 1. &ldquo;左子树 根 右子树&rdquo;成环,2.合并。递归基显然为根节点为空,直接返回。递归的部分就是:左,右成环.每次递归完成的事情就是: 将根成环,合并左根右三个环，合并动作就是将两个循环链表合并成一个连表的函数。</p>
+
+<pre><code class="language-go">type TreeNode struct {
+	Left  *TreeNode
+	Right *TreeNode
+	Val   int
+}
+func BST2DLL(root *TreeNode) *TreeNode {
+	if root == nil{
+		return nil
+	}
+	aLast  := BST2DLL(root.Left)
+	bLast := BST2DLL(root.Right)
+	root.Left = root
+	root.Right = root
+	aLast = Append(aLast,root)
+	aLast = Append(aLast,bLast)
+	return aLast
+}
+func Append(a,b *TreeNode) *TreeNode  {
+	if a == nil{
+		return b
+	}
+	if b == nil{
+		return a
+	}
+	 aLast := a.Left
+	 bLast := b.Left
+	 Join(aLast, b)
+	 Join(bLast, a)
+	return a
+}
+func Join(a, b *TreeNode) {
+	a.Right = b
+	b.Left = a
+}
+
+</code></pre>
+
+<h2 id="30-insert-into-a-cyclic-sorted-list-在循环有序的链表中插入结点">30.Insert into a Cyclic Sorted List 在循环有序的链表中插入结点</h2>
+
+<p>这道题,就是考察多种情况的分析,第一种若是空链表时,插入值在最大与最小之间,小于最小或者大于最大时。将不同的情况考虑清楚即可。按照数轴。<a href="http://www.cnblogs.com/grandyang/p/9981163.html" rel="nofollow noreferrer" target="_blank"><strong>这里</strong></a>很详细</p>
+
+<h2 id="31-k个一组翻转链表-https-leetcode-cn-com-problems-reverse-nodes-in-k-group-description-利用哨兵减少指针操作-利用k作为计数器控制pre-left-right边界指针进行操作-根据计数器移动指针到正确位置-翻转链表-方法比较笨拙但是简单有效哈哈-以后有时间在优化-现在我还是尽量多涮题-见识更多的类型-收集更多数据先训练个基本模型">31.<a href="https://leetcode-cn.com/problems/reverse-nodes-in-k-group/description/" rel="nofollow noreferrer" target="_blank">k个一组翻转链表</a>利用哨兵减少指针操作,利用k作为计数器控制pre,left,right边界指针进行操作。根据计数器移动指针到正确位置,翻转链表。方法比较笨拙但是简单有效哈哈,以后有时间在优化,现在我还是尽量多涮题,见识更多的类型,收集更多数据先训练个基本模型。</h2>
+
+<pre><code class="language-python">class Solution:
+    def reverseKGroup(self, head, k):
+        &quot;&quot;&quot;
+        :type head: ListNode
+        :type k: int
+        :rtype: ListNode
+        &quot;&quot;&quot;
+        if k &lt;= 0 or not head or not head.next:
+            return head
+        dummy = ListNode(-1)
+        dummy.next = head
+        cur = head
+        pre = dummy
+        while cur:
+            left,right = cur,cur
+            for i in range(k-1):
+                cur = cur.next
+                if cur is None:
+                    return dummy.next
+                right = cur
+            self.nx(pre,left,right)
+            cur = left
+            pre = left
+            cur = cur.next
+        return dummy.next
+    def nx(self,pre,l,r):
+        if not pre or not l or not r or l == r:
+            return l
+        p ,cur,next = pre,l,l.next
+        tmp = r.next
+        while cur != tmp:
+            cur.next = p
+            p = cur
+            cur = next
+            if next:
+                next = next.next
+        pre.next = p
+        l.next = tmp
+</code></pre>
+
+<h2 id="32-合并k个排序链表-https-leetcode-cn-com-problems-merge-k-sorted-lists-description">32.<a href="https://leetcode-cn.com/problems/merge-k-sorted-lists/description/" rel="nofollow noreferrer" target="_blank">合并K个排序链表</a></h2>
+
+<p>此题可以做的很精妙,但是我这里先给出一个直觉式的暴力解法,以后有机会在不断优化。此题可以理解为,每次从list中选择最大的节点,从中剔除利用哨兵组成新的节点,然后在将链表更新,不断跌代,最后当list为空结束。</p>
+
+<pre><code class="language-python">class Solution:
+    def mergeKLists(self, lists):
+        &quot;&quot;&quot;
+        :type lists: List[ListNode]
+        :rtype: ListNode
+        &quot;&quot;&quot;
+        dummy = ListNode(-1)
+        cur = dummy
+        while len(lists) != 0:
+            index = self.min(lists)
+            if not lists[index]:
+                del lists[index]
+                continue
+            cur.next = lists[index]
+            if lists[index] and lists[index].next:
+                lists[index] = lists[index].next
+            else:
+                del lists[index]
+            cur = cur.next
+        return dummy.next
+    def min(self,lists):
+        m = lists[0]
+        index = 0
+        i = 1
+        while i&lt;len(lists):
+            if lists[i] and m and m.val &gt; lists[i].val:
+                m = lists[i]
+                index = i
+            i += 1
+        return index
+</code></pre>
+
+<h2 id="33-删除链表中的节点-https-leetcode-cn-com-problems-delete-node-in-a-linked-list-description">33.<a href="https://leetcode-cn.com/problems/delete-node-in-a-linked-list/description/" rel="nofollow noreferrer" target="_blank">删除链表中的节点</a></h2>
+
+<p>思想比较巧妙,你只有给定节点,没有前驱节点的指针.巧妙的利用赋值的思想解决。</p>
+
+<pre><code class="language-python">class Solution:
+    def deleteNode(self, node):
+        &quot;&quot;&quot;
+        :type node: ListNode
+        :rtype: void Do not return anything, modify node in-place instead.
+        &quot;&quot;&quot;
+        tmp = node.next
+        node.next = node.next.next
+        tmp.next = None
+        node.val = tmp.val
+</code></pre>
+
+<h2 id="34-链表的中间结点-https-leetcode-cn-com-problems-middle-of-the-linked-list-description">34.<a href="https://leetcode-cn.com/problems/middle-of-the-linked-list/description/" rel="nofollow noreferrer" target="_blank">链表的中间结点</a></h2>
+
+<p>本来按照顺序此题放在前面,后来发现居然没写,在这里加上吧。前面多次提到,中间节点,快慢指针呀</p>
+
+<pre><code class="language-python">class Solution(object):
+    def middleNode(self, head):
+        &quot;&quot;&quot;
+        :type head: ListNode
+        :rtype: ListNode
+        &quot;&quot;&quot;
+        if not head and not head.next:
+            return head
+        slow,fast = head,head
+        while fast and fast.next:
+            fast = fast.next.next
+            slow = slow.next
+        return slow
+</code></pre>
+    </div>
+
+    <div class="post-copyright">
+             
+            <p class="copyright-item">
+                <span>Author:</span>
+                <span>觉有情 </span>
+                </p>
+            
+           
+             
+            <p class="copyright-item">
+                    <span>Link:</span>
+                    <a href=http://jueyoq.top/2019/linked_list/>http://jueyoq.top/2019/linked_list/</span>
+            </p>
+            
+             
+            <p class="copyright-item lincese">
+                本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可
+            </p>
+            
+    </div>
+
+  
+    <div class="post-tags">
+        
+            <section>
+            <i class="iconfont icon-tag"></i>Tag(s): 
+            
+            <span class="tag"><a href="http://jueyoq.top/tags/leetcode/">
+                    #leetcode</a></span>
+            
+            </section>
+        
+        <section>
+                <a href="javascript:window.history.back();">back</a></span> · 
+                <span><a href="http://jueyoq.top">home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+         
+        
+        <a href="http://jueyoq.top/2019/ddia/" class="next" rel="next" title="数据密集型应用系统设计-读后感">数据密集型应用系统设计-读后感&nbsp;<i class="iconfont icon-right"></i></a>
+        
+    </div>
+
+    <div class="post-comment">
+          
+                 
+          
+    </div>
+</article>
+          </div>
+		   </main>
+      <footer class="footer">
+    <div class="copyright">
+        &copy;
+        
+        <span itemprop="copyrightYear">2014 - 2020</span>
+        
+        <span class="with-love">
+    	 <i class="iconfont icon-love"></i> 
+         </span>
+         
+            <span class="author" itemprop="copyrightHolder"><a href="http://jueyoq.top">觉有情</a> | </span> 
+         
+
+         
+		  <span>Powered by <a href="https://gohugo.io/" target="_blank" rel="external nofollow">Hugo</a> & <a href="https://github.com/liuzc/leaveit" target="_blank" rel="external nofollow">LeaveIt</a></span> 
+    </div>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    <script src="/js/vendor_no_gallery.min.js" async=""></script>
+    
+  
+
+
+
+     </div>
+  </body>
+</html>

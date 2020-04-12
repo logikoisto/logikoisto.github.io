@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>算法训练 on 孙权</title>
+    <link>http://jueyoq.top/categories/%E7%AE%97%E6%B3%95%E8%AE%AD%E7%BB%83/</link>
+    <description>Recent content in 算法训练 on 孙权</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 10 Aug 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://jueyoq.top/categories/%E7%AE%97%E6%B3%95%E8%AE%AD%E7%BB%83/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>算法训练-链表问题</title>
+      <link>http://jueyoq.top/2019/linked_list/</link>
+      <pubDate>Sat, 10 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://jueyoq.top/2019/linked_list/</guid>
+      <description>&lt;p&gt;本篇将介绍关于链表算法的基本解体思路与经典问题,本篇不仅仅追求的是写出优秀的链表代码,更在意的是在有限时间内,如何写出&lt;code&gt;bug free&lt;/code&gt;的链表代码。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

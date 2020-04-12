@@ -1,0 +1,1371 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>孙权 on 孙权</title>
+    <link>http://jueyoq.top/</link>
+    <description>Recent content in 孙权 on 孙权</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 10 Aug 2019 00:00:00 +0000</lastBuildDate>
+    <atom:link href="/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>我为什么叫无用</title>
+      <link>http://jueyoq.top/2019/useless/</link>
+      <pubDate>Sat, 10 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://jueyoq.top/2019/useless/</guid>
+      <description>&lt;p&gt;&lt;code&gt;无用&lt;/code&gt;这个名字是一种警醒,时刻提醒我对那些被忽视的事物保持好奇。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>数据密集型应用系统设计-读后感</title>
+      <link>http://jueyoq.top/2019/ddia/</link>
+      <pubDate>Sat, 10 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://jueyoq.top/2019/ddia/</guid>
+      <description>
+
+&lt;h1 id=&#34;存储与检索的基本设计理念&#34;&gt;存储与检索的基本设计理念&lt;/h1&gt;
+
+&lt;p&gt;本篇主要讲述我对DDIA这本书的个人理解,帮助读者更快的了解DDIA并以一种思维贯穿始终,以便可以更好的应用在实际问题当中。数据密集型系统是指,通过IO将数据进行处理的系统,而用于解决将数据进行计算分析的系统则称之为计算密集型系统,本篇主要讨论数据密集型系统&lt;/p&gt;
+
+&lt;h1 id=&#34;数据系统的目标&#34;&gt;数据系统的目标&lt;/h1&gt;
+
+&lt;p&gt;数据密集型系统的主要指标有三个,可扩展性,可靠性,可维护性&lt;/p&gt;
+
+&lt;h3 id=&#34;可扩展性&#34;&gt;可扩展性&lt;/h3&gt;
+
+&lt;p&gt;可扩展性强调数据系统可以通过增加单台机器的性能或者机器的数量来使系统的负载线性增长的一种表现。通过增加单台机器的内存,磁盘,cpu核数或者处理能力,来垂直的增加系统的负载能力可以称之为垂直扩展,而通过增加同规格机器的数量来使负载增强的方式可以称之为水平扩展。对于计算机硬件来说,单台机器的性能总是昂贵的,所以水平扩展的方式虽然在实现上更加复杂,但因其成本很低,故而被广泛采用,随着数据规模的增加,成本的考量将成为重中之重。&lt;/p&gt;
+
+&lt;h3 id=&#34;如何描述一个系统的扩展性&#34;&gt;如何描述一个系统的扩展性?&lt;/h3&gt;
+
+&lt;p&gt;对于一个通常的系统,我们主要考察三点,吞吐率,响应时间以及失败率.吞吐率强调在单位之间内处理请求的数量。他强调了一个数据系统能够处理多大的数据规模,响应时间指的是处理一次请求需要用到的时间。二者是相辅相成的,不能孤立存在。因为对于实际中的系统,所有的指标都应该在相同数据规模的前提下,假设一个系统在一秒中接受到了10万个请求,其表示在一瞬间有10万个请求到达服务器,那么其吞吐率就是10w/s;但是每个请求却用了10秒中来处理,其响应时间就是10s/sec而在这10秒中的时间窗口中又有一半的请求失败,其失败率为50%。所以三个指标必须在一定数据规模的前提下同时限定才能描述一个数据系统的扩展性。对于三个参数指标,其精准的测量一般是没有意义的,而是采用统计的方式进行描述,并且坚决鄙视平均值,而是使用百分位数来描述,即在一定吞吐量下,百分之多少的请求数内,其响应时间及其失败率是有效的。例如,10wQPS(吞吐率)下,百分之九十九的请求其响应时间最慢是二十毫秒,其失败率为千分之一。&lt;/p&gt;
+
+&lt;h3 id=&#34;可靠性&#34;&gt;可靠性&lt;/h3&gt;
+
+&lt;p&gt;数据系统需要长时间的运行,理想的期望是永不间断,然而总是会有各种问题导致其失效,某种异常没有处理,导致系统崩溃或者负载占用资源过高(例如OOM)被系统kill掉。一旦系统无法对外工作,我们就说其已经失效。如何描述一个系统的可靠性呢?通常我们在一个数据系统在一年中,累积失效的时间来衡量,例如: 系统可靠性为99.999%,即在系统运行的一年中累积只有0.001%的时间处于不可用状态,也就是大约累积5分钟的失效时间。&lt;/p&gt;
+
+&lt;h3 id=&#34;可维护性&#34;&gt;可维护性&lt;/h3&gt;
+
+&lt;p&gt;可维护性的范围有些广泛,数据系统本质上是一种超大型的复杂软件,软件是具有生命周期的,其需求与功能都是在不断的变化的,我们需要在一定程度上面向未来的需求设计软件。以便可以更简单的部署,运维,扩展与修改系统。同时打造人类可理解的系统也尤为重要,说到底,软件是服务于人的,必将由人来负责,因此系统行为的可观测性与可理解性非常重要,对于静态的代码,可读性非常关键,这直接关心到一个软件系统的生命力,程序员对于生涩难懂的代码,需要花费大量的精力来理解,提高了其维护成本,对于一个系统来说,影响很可能被持续放大,例如如果程序员无法准确的监控系统,那么系统很可能产生程序员不可理解的行为,这种行为有可能没有意义,或者在特定场合触发bug,甚至可能是导致系统全部失效的bug,进而影响了可用性,又或者一个不可理解的行为导致系统吞吐量,响应时间等可扩展性指标无法提高或者下降。不能预期的行为在系统中是诱发问题的根本所在,因此从长远的角度来看,这三个关键指标中,可维护性是软件在整个生命周期中最应该重视的指标。并且,我们在此断言,系统不可理解的行为通过系统运行的放大作用,终将造成困难。&lt;/p&gt;
+
+&lt;h1 id=&#34;模型与语言&#34;&gt;模型与语言&lt;/h1&gt;
+
+&lt;p&gt;任何一个计算机从宏观上来看,其最主要的功能是用于计算与存储数据,对于数据密集型系统,其工作就是存储数据并在多个数据结构之间转换以及传输数据。那么为了支持系统存储数据,就需要特定的数据结构,但是底层的数据结构是面向计算机的,为了给使用者提供统一的心智模型,需要抽象一种人类可以接受的数据结构(尽管底层并非这样存储),这样的面向人类的模型就是数据系统的模型,对于存储系统来说,最基本的操作就是增删改查,以及对模型结构的操作,我们不能提供单一的命令或者API使用户操作特定的功能,为了支持复杂的查询统计功能,我们需要定义一种语言,以便用户更加灵活的操作这样的数据库系统。由此,我们知道,数据库的模型与语言是相互影响的,模型定义了基础的存储结构,语言提供了操作模型的规范,以决定以何种方式转换与传输数据。&lt;/p&gt;
+
+&lt;h1 id=&#34;表模型与sql&#34;&gt;表模型与SQL&lt;/h1&gt;
+
+&lt;p&gt;在所有的数据库系统中,表模型是一种通用且成熟的模型,历史悠久的表模型基于行或列的存储,将每一条记录存储为多个字段所代表的一行记录,与人类组织数据最常用的表格非常相似,因此而得名。数据表的模型可以支持各种各样的需求。但并非每一种都很优雅。为了操作表模型,定义了SQL语言(结构化查询语言),其本质是一种结构化命令的语言,数据库通过解析SQL生成执行计划,并以此来操作表模型的方式实现数据库的各项功能。表模型的优点在于 支持各种各样的数据处理形式,无论是查询单表,还是join多张表,一对多,多对一,其存储引擎非常的成熟,抗住很多应用场景的使用,但其本身也是有缺点的,表模型在逻辑上与应用程序的数据模型天生不一致,应用层主要是面向对象,而数据库是表模型,二者操作之间需要对数据进行转换,这是一种代价,在开发设计阶段,为了遵循表设计的范式反而变得麻烦,表设计也算是表模型的一种代价,在使用之前我们需要根据规范设计合理的表结构,这也是一种开发成本,sql的使用上为了得到更高的性能表现,需要对sql的使用进行优化,这也是一种使用成本,总之mysql,PostgreSQL,Oracle等数据提供全能而成熟的表模型时也同样引入了学习,使用,维护上的复杂度。&lt;/p&gt;
+
+&lt;h3 id=&#34;文档模型与其查询语言&#34;&gt;文档模型与其查询语言&lt;/h3&gt;
+
+&lt;p&gt;文档模型就是将一条记录组织成json等文本形式的存储模型,其查询语言也是类似json的形式。其优势在于对操作数据性能的提升,以失去表模型对&lt;code&gt;多对多&lt;/code&gt; join查询的灵活性为代价。将数据组织成json的好处是,充分的利用数据模型中局部性原理,在查询某一范围相关的数据时可以快速的将数据返回,获得低延迟的查询效果。同时不用考虑严格的表规范,不再存在类似表结构的约束,每一json记录都可以拥有任意字段,非常的灵活多变,以此来应对对数据处理的各种场景。但其缺点也很明显,那就是不太适合数据记录之间有太多关系的场景尤其是&lt;code&gt;多对多&lt;/code&gt;等需要大量join查询的场景。同时,无写入时模式不代表其没有模式,其约束会在读取时做检查,对支持的索引类型等进行校验。&lt;/p&gt;
+
+&lt;h3 id=&#34;图数据模型与graphql&#34;&gt;图数据模型与GraphQL&lt;/h3&gt;
+
+&lt;p&gt;图模型是另一种极端,图模型也是一种读时模式检查,这意味着写入时不做约束,这一特性让数据模型的建立变得快速而随意,将所有的记录组织成图的表述形式,对于图有三种表述形式,&lt;code&gt;三元组&lt;/code&gt;,&lt;code&gt;属性图&lt;/code&gt;,&lt;code&gt;超图&lt;/code&gt;.目前前两者使用的比较多,将数据组织成,&lt;code&gt;主语&lt;/code&gt;,&lt;code&gt;谓词&lt;/code&gt;,&lt;code&gt;宾语&lt;/code&gt;形式来存储数据,或者组织成&lt;code&gt;节点&lt;/code&gt;,&lt;code&gt;关系&lt;/code&gt;,&lt;code&gt;属性&lt;/code&gt;或&lt;code&gt;节点&lt;/code&gt;的方式存储数据。图模型的最大优势就是其对复杂关系的灵活支持,对于关系稠密的数据场景其可以利用图遍历的局部性优势快速的实现各种&lt;code&gt;多对多&lt;/code&gt;查询。&lt;/p&gt;
+
+&lt;h1 id=&#34;数据库的两种类型&#34;&gt;数据库的两种类型&lt;/h1&gt;
+
+&lt;p&gt;数据处理存在两种类型OLTP与OLAP,分别是在线事务处理与在线分析处理,之所以要从用途的角度如此划分,对两种指标的不同需求,OLTP追求低延迟,用于快速的响应用户的请求,所以适合在线业务使用,OLAP追求的是吞吐量,为用户提供大量数据的离线计算与存储,进而得到分析数据后,给用户使用,事实上数据处理从目标上来说,一种是给用户提供一致的操作(增删改)以及局部的查询,这些都应该一致且快速,而剩下的则是大规模的查询需求,通常需要全表扫描与离线并行计算,通常在数据仓库技术中使用,查询结果通常会计算的很慢,所以衡量的指标应该是磁盘IO的吞吐量而非返回数据的延迟。从本质上正是对数据系统所期望的功能不同,进而考察的指标也会不同,从而产生了数据处理的这两种分类,以后的文章我会分别叙述这二者在实现与设计理念的不不同考量。&lt;/p&gt;
+
+&lt;h1 id=&#34;数据库如何存储数据&#34;&gt;数据库如何存储数据?&lt;/h1&gt;
+
+&lt;p&gt;数据库的核心就是持久化的存储数据,持久化的存储依赖于磁盘(依赖内存是否也能持久化呢?),那么将数据写入磁盘,并从磁盘中读取数据就是数据库的核心功能。但,数据库的意义在于高效的存储并支持复杂的查询方式,保证查询关联数据的性能。所以数据库必须做到,支持写入大量数据文件并以多种多样的维度读取文件。那么如何做到呢?以关系型数据库为例,一行记录假如在文件中就是一行字符串,怎么做到快速的插入一行字串呢?磁盘是圆的,通过磁头与磁针的调整进行寻址,寻道。这是磁盘存储数据最耗时的动作,减少耗时且不必要的事情就是性能优化的哲学。因此,我们通过仅追加写文件的方式存储数据就会使写入的性能最高效,因为磁头与磁盘不需要来回的寻道,寻址。但,仅追加的写入文件,那我要是想删除这个文件,或者修改这个文件该怎么办?那就采用版本追加的方式,无论是删除还是修改操作,都仅追加的写入文件一行记录,为数据库创建一个自增的唯一字段,用来表示唯一的数据记录,删除和修改操作都是仅追加到文件但唯一字段相同,然后在读取时从文件尾部开始读取数据,这样一来,匹配唯一标识的第一个记录就是最新的记录值了,但是新的问题是这样的, 存储方式会大量的浪费磁盘空间,文件会越来越大,从而影响查询的性能,因为大部分数据都会是旧版本数据。所以,我们需要定期的对数据文件进行压缩,仅追加文件到一定大小时,就将其复制一份并压缩(去除重复标识的记录),以便节省空间,但是压缩文件的数量又太多怎么办?我们就将其进行合并,定期的按顺序将文件合并成一个大文件,这样一个最简单的原始数据库的存储部分的设计就完成了。
+这样一来,我们的写入性能将是最高的,可以说所有主流开源数据库的写入性能都没有这个设计快,但是软件架构的本质就是决策与权衡。这样的设计,读取一行记录需要遍历整个文件,如果读取第一个存储的数据,需要遍历整个文件,查询性能完全不可以接受,因此我们需要继续想一想如何提高读取的性能。&lt;/p&gt;
+
+&lt;p&gt;查询是数据库存在的意义,影响我们存储数据的结构有两个因素,一个是占用空间的大小,一个是查询时的响应时间,通常后者更加重要,数据库存储的数据本质上也是文件,如何能快速的找到文件内的某个记录呢?分类是快速找到曾经放置物品的方法,这在计算机中同样适用,为数据记录建立分类,那么分类应该怎么被存储,也就是说每次在添加,删除,更新数据记录的时候都要将分类信息也一同更新吗?这样不会更慢吗?但是,这是值得的,因为在数据库中查询是一等重要的事情。那么这个分类将是什么结构的呢?观察生活中的细节,书中的目录本质上是分级的,也就是树形的结构,那么分类以树作为存储结构应该是最自然的,但树的本质是映射,那么hash映射应该也是可以作为分类的,我们以一个人的身份证id为key,经过散列也可以得到其位置信息,而且查询速度更快。但很显然,hash的形式是没法进行顺序查询的对于要求顺序范围的查询将无能为力。在这里,需要给这个分类数据结构下一个定义,将这种可以帮助我们快速找到数据集的数据结构称之为索引,事实上存储数据库主要工作就是如何维持索引的正确性以及有效性。&lt;/p&gt;
+
+&lt;p&gt;使用树作为索引,那使用什么树?从最简单的二叉树说起,我们知道,索引应该被存储在磁盘上,每个节点都应该代表磁盘的一个可寻址的地址信息,索引树的查询效率是与树的高度成正相关的,因为树的高度决定你要在磁盘上进行多少次的寻址操作,而磁盘的寻址是耗时的操作,因此一个优秀的适合磁盘的索引树应该是尽量降低树的高度的树。对于树来说,我们知道删除与添加操作会破坏树的平衡性,使树的查询效率退化,数据库是支持任意删除与添加的,所以索引树应当可以自平衡,AVL还是红黑树?这几种树都是二叉树,树的高度会很高,降低树的高度一定是M叉树,能自平衡的树很显然是B树。B树是一种自平衡的多叉树,将B树充分与磁盘的特性结合,B树的一个节点本质上是一个数组,表示数据记录中的一个索引字段,这个数组的大小恰巧设计成一个磁盘页的大小,因为文件系统读取磁盘时是按页批量读取的,一次IO可以读取一个64KB的磁盘页到内存中。这样64K大小就可以用来存储数据了,然而如果非叶子节点上存在数据记录,那么就会影响这个节点能包含的索引字段的数量,索引字段存储的少了,还是会增高B树的高度,同时会造成数据分布不均匀,使查询的效率变的不稳定。所以,还是需要改进一下B树,进而引入了B+树,我们将数据记录全部存储在B+树的叶子节点上,并且将叶子节点连成一个链表便于进行范围查询,这就实现了sql中的模糊查询,区间查询等功能。这样一来,非叶子节点上全部都是索引字段,那么就可以将树的高度将到最少,同时作为B+树我们还可以,在数据的删除与插入时对其进行自平衡操作,为B+树的每个节点进行分裂与合并操作。&lt;/p&gt;
+
+&lt;p&gt;现在我们引入了索引数据,那么在文件结构上如何进行设计呢?假设我们以唯一的标示ID为索引字段,那么如何将索引文件与数据文件相互联系起来呢?这里有两种方式,将索引文件与数据文件合并在一起,这样查询效率是最高的,但缺点是只能有一个索引字段(很显然用主键作为索引,主键就是我们说的数据记录的唯一标识),没办法扩展索引,如果我们要扩展到多个需要索引的字段,那就只能在数据文件之外扩展索引文件,那么B+树的叶子节点存储的是什么呢?存储着主键?这样独立的索引文件会更加节省空间便于扩展,存储着数据记录的磁盘地址吗?那要是地址发生变化更新地址会很麻烦,所以综合来看,存储主键比较合适。上述的两种索引类型即是聚集索引与非聚集索引的区别。&lt;/p&gt;
+
+&lt;p&gt;然而,回到最初的设计 如果我们真的使用上述的B+树的索引 那么就意味着我们必须在磁盘上进行随机的读写,幸运的是索引的存在使得随机的写入磁盘不是那么难以接受,上述索引实现方案称之为 原地更新, 与我们上述所说的仅追加写入是有所差别的,这种原地更新文件的实现方案,通常是主流关系型数据库的实现方案,通常适合那些 有大量并发请求,少量写入,多数读取的场合。那么我们最开始设计的数据库,有什么意义呢? 能不能继续利用仅追加的方式实现?如何在保证写入吞吐量的前提下降低读取的延迟?&lt;/p&gt;
+
+&lt;p&gt;如果我们可以充分的利用内存的特性就可以做到这一点,所有的写入都可以先写在一个有序的内存结构中,不能是hash表,因为按索引字段维护顺序,内存中维护顺序的适合索引的数据结构有哪些?红黑树?跳表?  这些都是可以的,只要将所有的写入请求全部在内存中存储一份,当内存的数据容量到达一个阈值后,就可以按顺序的 仅追加的写入磁盘文件中,这样的文件称之为SSTable,而这样的内存数据结构称之为LSM树,日志排序归并树,而这种存储引擎的实现方案称之为日志结构更新方案。&lt;/p&gt;
+
+&lt;p&gt;但是上述使用内存的LSM+SSTable的方案,如果节点崩溃内存数据没有来得及合并到磁盘文件中,那数据是否就丢失了呢?原地更新的方案也是存在这样的问题,我们还是会在未插入之前就可能崩溃丢失数据,那么有什么办法可以提高数据库的可靠性呢?那就是充分利用可追加文件的特性,我们可以写入记录到来之前立刻,将数据写入一个文件中,这个文件是仅追加的写入,非常的快速(文件系统缓存,磁盘不需要寻址寻道),并且这个文件不需要建立索引,当数据库重新启动的时候我们可以先去读取这个文件内的写入记录,逐条的将记录写入存储引擎中即可,当然如果在写入追加文件中崩溃了那就没办法了,不过经验证明这样的可靠性已经足够,这个仅追加的用于数据恢复的文件称之为VWL,预写日志文件。&lt;/p&gt;
+
+&lt;p&gt;综上,我们数据库就设计完了,这样一个简单的描述,就是现代数据库存储引擎的核心理念。&lt;/p&gt;
+
+&lt;h1 id=&#34;列式存储&#34;&gt;列式存储&lt;/h1&gt;
+
+&lt;p&gt;列式存储是将一条数据记录的列单独存储在不同的列文件中,所有的列文件以顺序来唯一表示一条完整的记录。列式存储是专门对大量的离线查询进行优化的存储格式,这样做有什么益处?首先,这种存储方式解决了行存储中,列数量过多造成聚合查询时IO操作了太多无用数据。大多数情况下聚合查询仅仅关注记录的一部分,在列存储的数据库中,聚合查询时,只需要将那个单独一列的文件进行读取即可。其次,就是列式存储形式极易适合对某一列单独进行压缩处理,数据一旦被压缩那么就会提高读取一写入的吞吐量&lt;/p&gt;
+
+&lt;p&gt;如何压缩?根据记录的特点进行压缩,例如排序的列,并存在重复值,可以使用三元组压缩,(x,y,z), 表示从数值x从第y行到第z行都是x值,如果重复数值多但是没有排序则可以使用位图进行压缩,还可以对位图进一步压缩表示,对于有序且重复不多的列可以将当前数值表示为前一个数值加上一个变化量的形式,然后再对其进行压缩。&lt;/p&gt;
+
+&lt;p&gt;列式存储中,文件的形式是每一列单独一个文件,在文件后半部分标示数据字段在文件中的偏移位,这就导致当列式存储的数据库想要写入一条数据记录时需要操作更多的列文件,而且由于严格依赖顺序位置来关联不同的列文件中的列为同一条记录,因此很难建立索引,不过由于列存储数据库通常用于大规模查询的OLAP场景,因此可以将数据的不同备份之间以不同的key进行排序,以此来达到加速查询的目的。&lt;/p&gt;
+
+&lt;p&gt;同时,我们还可以使用上文提到的LSM+SSTable的方法实现存储来提高列式存储的写入吞吐量,并利用LSM树的特定对列文件进行排序。&lt;/p&gt;
+
+&lt;h1 id=&#34;数据系统之间的通信&#34;&gt;数据系统之间的通信&lt;/h1&gt;
+
+&lt;p&gt;内存中的数据以内存数据结构进行存储,数组,树,堆,map等等 但是将其存储在磁盘上时,往往需要进程转换,显而易见的原因在于,内存中的数据结构都是通过虚拟内存指针相互引用的,对于磁盘毫无意义。因此需要一种技术,可以内存中的数据转换为磁盘中的数据格式,这种技术称之为序列化,同时也需要将磁盘中的数据恢复到内存中,称之为反序列化。 而从更加通用的角度来理解,这种数据格式的转换在各种场景中都是存在的,数据系统之间需要通过网络进行通信,那么就需要将内存中的数据变为适合网络传输的格式,并且接收方可以将其转换回内存结构。 种种场景都需要将数据的格式进行编码与解码,而本篇将主要介绍在数据系统中,如何治理通信的编解码过程中 性能, 可读性, 兼容性 三者之间的矛盾。&lt;/p&gt;
+
+&lt;h1 id=&#34;编码格式&#34;&gt;编码格式&lt;/h1&gt;
+
+&lt;h3 id=&#34;json-xml&#34;&gt;JSON &amp;amp; XML&lt;/h3&gt;
+
+&lt;p&gt;编码格式属于一种协议,对于协议最重要的事情就是要被广泛的接受并使用,它才具有意义。在数据系统中真正的被广泛使用的编码格式无疑是人类可读的编码格式,XML与JSON.其流行得益于其良好的可读性以及被各种语言的标准库支持,使其更加流行,进一步降低了其使用成本,而json相较于XML则发挥了其简单实用,更加紧凑的特性,成为互联网最流行的跨语言数据传输格式.每种语言都有其自己的序列化协议,然而饱受诟病的在于其性能的差强人意,以及不支持跨语言的特性,给了json最大的机会.现在,大型的数据系统都需要使用多种语言进行开发,跨语言传输的需求已经成为刚需。
+json&amp;amp;xml的劣势也很明显,可读性限制了其性能,数据系统越来越频繁的传输数据,使用json等文本协议解析数据,已经成为一种性能平静瓶颈,进而产生对二进制传输协议的需求。同时,json &amp;amp; xml其文本格式无法对数据控制精度,在一些不允许误差的场景中,并不能继续胜任。&lt;/p&gt;
+
+&lt;h3 id=&#34;thrift-protobuf-avor&#34;&gt;thrift &amp;amp; protobuf &amp;amp; avor&lt;/h3&gt;
+
+&lt;p&gt;人们开始追求一种更快的可以控制精度,组织复杂数据格式的序列化协议。
+上述三种协议作为一种跨语言的RPC二进制通信协议,其底层支持多种不同的协议,但作为二进制协议,通常表现上都是通过IDL定义一套模式,然后生成多种语言的代码库,进而被嵌入程序中使用,这是一种简单的使用方式。&lt;/p&gt;
+
+&lt;p&gt;thrift与protobuf是相似的,通过IDL定义模式,生成不同的代码库嵌入不同的语言中,编码方式上,都是需要一个标签字段作为唯一标示,不使用用名字的原因是保证顺序且与业务无关,这样一来就可以做到在整个版本演进的过程不会有改变标签字段的需求,仅可以删除(尽量不要删除)或者添加。同时,对于每个字段都可以有选项指定其是必须的还是可选的亦或者存在默认值,如果想在今后的版本迭代中在客户端与服务端不能保证版本一致的情况下继续使用,那么最好将字段变为可选并存在默认值的,这样一来旧的客户端就可以对没有读取到的实际上已经被删除的字段填充默认值&lt;/p&gt;
+
+&lt;p&gt;作为二进制协议,传输的肯定是字节流,对于字节流想要将信息还原为原来的形式,解码的一端需要知道数据字段的长度,类型,以及字段的值等信息,否则没有办法将其序列化回原来的样子。所以我们需要将其传输过去,字段名称呢?并不需要只需要传递标签即可,这是为了保证兼容性以及使字节流更加紧凑的权衡设计。&lt;/p&gt;
+
+&lt;p&gt;那这种方式如何保证兼容性呢?兼容性分为向前兼容与向后兼容,向后兼容指的是读取的一端是最新版本而写入数据的一端为旧版本,那么新版本一定知道旧版本中的模式定义,因此很容易做到兼容,只需要保留之前的标签字段,保证一个标签号没有使用过即可。新版本的读取端会将其已经删除的字段与新填入的字段赋予默认值,若为可选字段的话。&lt;/p&gt;
+
+&lt;p&gt;向后兼容指的是读取一端为旧版本,写入一端为新版本,旧版本需要预知新版本的模式,这也很容易通过标签号与选项实现,只要保证旧版本读取到未知的字段时自动忽略即可,而那些在新版本中删除的字段填充默认值即可,但倘若选择必填字段的选项,则会破坏兼容性,通常封装的框架会报错提示。
+但avor的设计却是不同的,其是hadoop的子项目,用于在大规模的传输数据的一种二进制协议。他有什么特点呢?其协议中没有所谓的字段标签号,类型,名称,长度,选项等信息,只有纯净的字段值组成的二进制流,这是已知所有二进制协议中编码最紧凑的协议。那他是如何保证正确的被解码呢?&lt;/p&gt;
+
+&lt;p&gt;TCP在通信前通过三次握手确定关系,avor在一次通信中,先彼此交换一个数据包,数据包中包含读模式与写模式. 模式结构中包含,将要发送数据的格式信息,比如字段的名称,由于采用这种策略,avor没有使用字段标签编号,而是直接以字段名称作为标识,同时还有字段长度,类型等信息。&lt;/p&gt;
+
+&lt;p&gt;那它是如何保证向前|后的兼容性呢? 读模式与写模式不必相同,当读模式更加新的时候,删除与添加的新字段会被赋予默认值或忽略。写模式更新的时候,则正好相反,依次达到相互兼容的目标。
+相较于thirft与protobuf的优势就是其不必在每次发送数据中包含格式信息,并且不必使用标签号,这样就会对发送数据的顺序不做要求,同时可以动态的更新。其劣势在于需要维护读写模式的版本状态,适合大规模的发送相同格式的数据。&lt;/p&gt;
+
+&lt;h1 id=&#34;数据流模式&#34;&gt;数据流模式&lt;/h1&gt;
+
+&lt;p&gt;所谓数据流模式,即是一种数据系统相互通信的方式,通常来说普遍的通信方式有四种 读写数据库,RestAPI,RPC,消息传递&lt;/p&gt;
+
+&lt;p&gt;从应用程序中写入数据,到应用程序读取数据,作为数据库这其中可能间隔了很长时间,一旦在这个过程中数据库的模式发生了变化,添加,修改或者删除了字段,旧版本的应用程序必须兼容,当然更新应用程序也是可以的,然后总是存在不能及时更新的情况。同时,在读写数据库的过程中,数据在内存中的表现形式会发生变化,被转换成应用程序关心的模型,这本质上是一种浪费,这个动作不能带来实质性的收益。
+RestAPI 使用http的协议,遵循一定规范而设计的应用程序与应用程序之间的通信方式。其特点是利用json等文本序列化协议通信,其特性就是可读性高,易于调试,但对性能有所损耗,并且对数据的类型精度的控制不足。然而,快速的开发速度与可读性高的需要大多数情况下是值得用性能交换的。
+RPC 远程过程调用,让应用程序像调用本地方法一样调用其他应用的接口,然而这是现实的,本地函数只有成功与失败两种状态,而远程过程调用却存在着,成功,失败,超时三种状态,反而是复杂度变高。但其本身,可使用二进制协议传输,因此其具备二进制协议的高效特性。
+消息传递,通常使用消息队列实现两个应用程序之间异步的传递消息,通常适用于不需要应答且可异步处理的请求,使用消息队列的好处是可以保证消息恰好一次被消费的语义,并异步的,可缓冲的发送请求,可以使消费者不至于被大量请求压跨。&lt;/p&gt;
+
+&lt;h1 id=&#34;数据的复制&#34;&gt;数据的复制&lt;/h1&gt;
+
+&lt;p&gt;当单一的服务无法应对负载压力时,我们可以使用共享架构,进行垂直扩展,也就是换内存更大,磁盘更多,CPU处理能力更强的机器,机器的内存与磁盘都是多个线程共享使用的.这是一种简单的策略,服务通常无需改动,但硬件设备性能提升一倍,其成本不只是提高一倍。往往因为其成本过于高昂,无法选择这样的方案。那么我们就需要使用多台相同硬件配置的机器,来进行扩展,也就是无共享架构,通过使用多台机器不相通的内存与磁盘,进程之间通过网络进行通信数据交换,获得了极高的扩展性,同时兼顾了成本的增加,这种无共享架构组成的系统就称之为分布式数据系统。 数据复制的意义在于,提高数据系统的可用性与可扩展性,我们通过将数据复制一份的方式进行备份以提高可用性,用备份数据分担流量以提高扩展性。 当单台机器的磁盘容量不足时,在分布式数据系统中,通过分区技术解决,将数据集合分成不同的子集合,分散在不同的机器上,提高存储容量的同时也会时各种操作变得更加复杂,但却解决了单机存储空间有限的问题,同时分散的数据也有助于分散负载压力,分担流量的好处是大大的降低了响应延迟。&lt;/p&gt;
+
+&lt;h1 id=&#34;主从复制&#34;&gt;主从复制&lt;/h1&gt;
+
+&lt;p&gt;对于两个进程节点,通常指定一个为主节点,负责所有的写入与部分的读取,另一个节点为从节点,用来根据主节点发送过来的变更消息,更新自己的数据集,并提供读取请求,因此主从复制可以除了可以冗余数据提高可用性外,也可以通过不断的增加从节点来提高系统的扩展性,需要注意的是往往主节点只有一个,也就是写请求无法得道到扩展,同时对于复制的方式也有两种选项,同步复制与异步复制,顾名思义,当主节点写入数据后,等待从节点写入成功的通知的复制方式为同步复制,无需等待通知的方式为异步复制,同步的好处是可以保证副本数据是最新的,进而保证读取副本信息的及时性,但坏处就是对整个系统的可用性造成影响,假设同步多个从节点,如果有一个节点因为自身或者网络问题无法通知主节点复制完成,那么整个系统就会无法工作。而异步复制虽然无法保证从节点的副本数据是最及时的,但却可以提供系统的可用性,并提供整个系统写入的吞吐量。
+如何想主从复制的集群中添加一个副本呢? 添加副本并不是简单的复制,如果停掉整个集群,然后从主节点复制数据那会很容易,但这是不可接受的损失,如何&lt;/p&gt;
+
+&lt;p&gt;保证在不停机的情况下添加一个新的副本呢?通常的做法是,从主节点快速生成一个快照并记住这个时间点,然后利用这个快照启动一个新的副本节点,之后将主节点在快照生成后的所有变更日志以流的形式应用到副本节点上,这样才能保证副本的数据一致性。&lt;/p&gt;
+
+&lt;p&gt;那么如何下线失效节点呢?有各种问题会是节点失效,如果是副本节点,那直接下线即可,重启时应用变更日志即可.但是如果是主节点呢?主节点需要接受写入的请求,一旦下线需要通知客户端变更写入请求的服务地址,并且还需要从集群的副本节点中选择一个作为主节点,选择谁呢?可以手动配置也可以通过共识算法选举,主节点的数据切换将会有数据冲突,丢失的风险,甚至是主节点伪崩溃在选举新的节点后又重新回来,造成多个主节点的脑裂现象。这些问题将在之后一一解答。&lt;/p&gt;
+
+&lt;p&gt;日志的复制是如何实现的呢?通常有三种方法,基于sql语句的复制,将日志中的sql语句按顺序再次执行一遍,这样的好处是sql语句进行复制较为简单,mysql1.5之前都使用这种方式,然而致命的是,如果我们的sql语句中包含不确定的部分,那么一致的复制将得不到保证,例如我们的sql中包含now()函数那该怎么处理呢?通常需要结合其他的复制实现方案,例如直接基于wal日志,基于二进制的复制好处是不需要像sql经过语法分析生成执行计划,消除了sql函数中的随机性,然而坏处是可读性降低,预写日志对数据库的版本兼容性有所要求,这给集群的扩展性与升级上造成了影响。目前,将二者结合使用比较流行,当sql中出现不确定的函数时将使用二进制传输,但这并不是完美的解决方案, 我们期望可以跨不同类型数据库的进行数据复制,与底层实现无关的复制协议,也就是说我们可以根据业务定义逻辑日志,这种逻辑日志跟数据库底层实现无关,每种数据库按照约定自行解析逻辑日志的内容,并应用于存储引擎,引入逻辑日志的设计,可以较好的解决上述问题。&lt;/p&gt;
+
+&lt;p&gt;数据的同步只要基于网络,那么就一定会存在网络延迟,所以主从复制的过程中必须解决复制过程中不可控的延迟因素对系统可用性与一致性的影响。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;读写一致性&lt;/strong&gt; 当用户在写入数据后,立刻要读取写入的数据时,采用主从复制的系统,将会面对着这样的问题,由于在主节点写入了数据,但立即的读请求却在从节点读取,如果是同步复制(但会延长用户的响应时间,通常不会使用) ,延迟较低不会太过明显,但如果使用异步复制 那么数据究竟在何时才会被真正写入从节点是不可控的,那么当用户立即的读请求被恰好分配给这个延迟的从节点,将会读不到其写入的数据。有什么办法可以解决这样的问题呢?  如果修改的数据仅仅是这个用户修改的,那么我们可以将写入后的同一个用的读取操作交由主节点完成,这样也不会造成太大的负载,这样会让用户立即看到其写入生效,但其他用户对这个数据的读取允许存在一些延迟,是可以的。第二种办法是动态的识别从节点数据的延迟情况,从延迟最低的节点进行读取。 第三种方法是通过逻辑版本号的方式,客户端请求时传递一个逻辑的版本号,服务端保证返回此版本号之后有效的数据,如果请求的节点没有有效数据,则交由其他节点完成。当存在跨多个数据中心进行主从同步的场景,读写一致性的问题会非常的明显。更加复杂的情况是用户在多设备上进行操作时,由于切换了网络,路由路径发生了改变,必须保证通过一个用户的请求落在同一个数据中心上,并且不能依靠逻辑时间戳等版本号信息,可以通过对用户ID进行唯一的hash散列,使其落在同一个数据中心内,简单的方法是,保证写入操作的用户从主节点立即读取到写入的数据,而让其他用户存在一些延迟的读取。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;单调读&lt;/strong&gt; 当用户读取数据时,保证其不会读取到历史数据,这样的一致性保证就是单调读。其成因为 用户在主节点写入数据,在一个滞后较短的节点读取数据,紧接着又在一个滞后很长的节点读取数据,那么用户可能读取到一个比之前更老的值.解决的办法就是给用户id散列,保证一个用户每次都访问相同的副本。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;因果一致性&lt;/strong&gt; 当用户连续的写入一些有关联的数据时,这些数据也要保证按写入的顺序读取。 例如第一条写入是一句问题,第二条是一句回答,两条记录是有因果依赖的.那么其他人在读取这两天记录时也应该先读取到问题在读取到答案。否则就会造成逻辑混乱, 保证因果一致性的方法在单机数据库中可以通过事物很好的保证,但在分布式系统中由于复制与分区的存在,尤其是分区的存在使的数据没有了全局的顺序,并且分布式数据库为了保证效率通常不完全的支持事物特性.导致分布式数据支持因果一致性的困难。直接的解决方案是,将因果依赖的数据划分到同一个分区之中.但这样会影响效率,不能做到跟据数据的特性进行分区,另一种做法是参照Linux对并发指令执行的顺序保证策略,先行发生原则,稍后会详细讨论。&lt;/p&gt;
+
+&lt;h1 id=&#34;多主复制&#34;&gt;多主复制&lt;/h1&gt;
+
+&lt;p&gt;主从复制的一大缺点就是,无法对写入请求进行水平扩展,所有的写请求都必须在同一台机器上完成,这样就会产生单点故障,当某段时间主节点存在网络抖动,而失效时所有的写入数据都将失效。那么,支持多个主节点的复制方式将变得非常诱人,但其难度将大大增高,所谓多主复制就是,写入请求可以负载到多个主节点上,每个写入请求写入一个主节点后,由其同步给其他主节点,也就是说每个主节点同时也是其他主节点的从节点。这样从架构上将完全的将读写请求水平扩展,但其实现难度却非常高,其本质上是因为我们在同一时刻,无法确定哪个节点副本上的数据是最新最完整的数据。&lt;/p&gt;
+
+&lt;p&gt;多主复制拥有其适用场景,例如为了提升机房级别容错性或者就近访问,使用多个数据中心,如果还是采用主从复制模型,那么对于写请求将失去意义,因为所有的写还是要请求主节点所在的数据中心,而使用多主复制模型,仅将写请求发送给最近的数据中新,然后同步的写入其主节点,之后在异步的同步到其他的数据中心主节点即可,但由于多数据中心之间较大的网络延迟以及存在写入冲突等问题,使得多主复制充满挑战。同时具有离线客户端操作的系统也可以看作网络可以无限延迟的多主复制问题,还有基于多人在线编辑面临的多主复制之间的写入冲突问题。&lt;/p&gt;
+
+&lt;p&gt;对于多主复制模型,如何解决写入冲突成为最大的挑战?最简单有效的做法就是避免冲突,将用户路由到一个确定的数据中心,所有的写操作都是有指定的主节点完成,对于用户来说他们像是使用主从模式。然而这种方案的弊端在于过于依赖用户与数据中心的相对位置,当数据中心迁移时,或者用户漫游到其他位置时,离之前的数据中心很远,这种方案将失去意义。其次,我们必须要保证所有的主节点允许出现短暂的不一致,但最终会收敛于相同的值,这可以使用时间戳或者版本号来确定写入的逻辑顺序,最终只能有一个写入请求胜利。这样做法简单但却会丢失数据,如果想不丢失数据,可以选择规定数据的格式,然后将数据进行合并,保留所有的数据。或者同时用户存在写入冲突,由用户处理冲突(git就是这样解决的)&lt;/p&gt;
+
+&lt;p&gt;对于多主复制来说,网络拓扑结构由三种,环形,星形,全部复制型。环形与星形都容易出现单点故障,使整个集群不可用,而全部复制型对网络压力较大,同时不好保证因果一致性,例如当像A节点写入数据后,在B节点进行更新,但由于网络问题,A的写入操作没有及时的复制到B节点,B节点则认为客户端更新一个不存在的记录.保证这种因果一致性的方法称之为版本向量,稍后会介绍,同时多主复制还要避免循环复制问题,当记录被复制时如何保证同一个节点接受了两次复制?通常对每个集群中的节点进行编号,复制的请求携带已经完成复制的编号信息,一旦节点检测到自己的编号则忽略复制请求。&lt;/p&gt;
+
+&lt;h1 id=&#34;无主复制&#34;&gt;无主复制&lt;/h1&gt;
+
+&lt;p&gt;之前讨论过的都是所有的写入请求集中在某些节点上,当这些节点不可用时就需要进行切换来保证集群可用。但在复制模型上还是存在另一种实现,无主复制模型,所有节点都对等存在同时接收写入与读取请求。这就给保证复制的一致性造成了新的挑战,客户端到底应该从哪个节点进行读取与写入?通常有两种做法,客户端同时写入多个节点,当半数以上返回成功即可,然后读取时也是从多个节点读取并选择版本最新的数据 另一种做法是使用一个协调者节点客户端与其交互,协调者节点不负责任何的写入与读取而是进行转发,不同的是协调者不会维护写入的顺序。&lt;/p&gt;
+
+&lt;p&gt;那么对于多主复制,失效的节点在恢复后,如何能修复中间错过的写入请求呢?&lt;/p&gt;
+
+&lt;p&gt;一种做法是,使用读修复,即在读取数据时,读取多个副本的数据,然后检测到最新版本的数据,并用最新版本的数据复制给其他副本上,在读数据时修复副本的不一致,但明显的弊端是对性能的影响。另一种方案称之为反熵,启动一个后台线程不断的校验各个版本的正确性,然后将其修复。但这有时并不及时,同时也无法保证顺序一致性。&lt;/p&gt;
+
+&lt;h3 id=&#34;法定人数quorum&#34;&gt;法定人数Quorum&lt;/h3&gt;
+
+&lt;p&gt;在分布式系统中,如何确定一个写入或者读取是成功的呢?需要全部的副本节点返回结果才可以吗?有没有更加高效的做法呢?我们知道,当读取的节点数为r,写入的节点数为w,而集群实际上的节点数为n时,当w+r&amp;gt;n 成立时,则 n&amp;gt;w时,则允许有n-w个节点写入失败,当n&amp;gt;r时,则允许有n-r个读取节点失败,这样读与写就可以以小于集群节点总数的代价进行读写操作。
+Quorum 并不是完美的,当发生一些边界情况时,依旧会读取到旧值,例如写后立即读取,写入的请求还没有及时的同步给足够的w数量的副本上,我们就要从r个副本上读取,那么这会存在读取到旧值的情况。例如,写入w个副本中,但其中却有写入失败的情况,使其w的值小于设定值,那么也会有可能读取到旧值。同时,Quorum也无法保证上面对一致性的种种要求,他仅能在正确工作的前提下保证最终一致性,而想要保证其正确工作就需要共识算法与分布式事务的支持。&lt;/p&gt;
+
+&lt;h2 id=&#34;多副本的并发写入冲突问题&#34;&gt;多副本的并发写入冲突问题&lt;/h2&gt;
+
+&lt;p&gt;我们需要先定义一下什么叫做并发操作,所谓并发指的是两个操作相互不依赖彼此,并不知道彼此的存在这样的操作可以称之为并发操作,其谁先执行谁后执行,或者同时执行都是允许的,相对的有依赖性的操作,也就是说两个操作之间存在因果关系,B操作必须依赖A操作先执行,如果二者的执行顺序不一致将会造成混乱,这样的操作称之为非并发的,线性操作。&lt;/p&gt;
+
+&lt;p&gt;现在有这样的一种问题,A客户端与B客户端同时写入5个副本中,A客户端并不知道B客户端的存在,成功的写入了三个副本&lt;code&gt;1,1,1&lt;/code&gt;,B客户端也写入相同主键的三个相同副本中&lt;code&gt;2,2,2&lt;/code&gt;,但由于网络延迟其中两个副本A客户端的写入后与于客户端的写入到达,则最终写入的是&lt;code&gt;2,1,2&lt;/code&gt;,破坏了法定人数的条件。&lt;/p&gt;
+
+&lt;p&gt;为了解决并发写入这样的问题,我们需要引入并发写入冲突的解决方案,最简单的方案就是以时间戳来判断,将最后写入的请求保留,其他的并发写入被丢弃,这种做法的优点在于非常的简单,但是确定也很明显,那就是多台机器的时间戳并不统一,而且多个副本间同步就会出现上述的问题。&lt;/p&gt;
+
+&lt;p&gt;更近一步,我们需要保留并发写入操作的不同版本,为每一个写入相同主键的操作分配一个唯一自增的版本号,当第一次写入时,我们不进行任何并发检测,而是直接分配版本号,并记录写入的值,当第二次写入时,需要写入上次的版本号信息,当版本号信息于数据库当前的版本号信息比较,发现较老时,说明这期间存在了并发操作的执行,这时只需要简单的将比该次操作版本低的值进行合并覆盖(将之前版本的数据与该次请求合并),保留比其版本高的值。
+进一步进行扩展到多副本场景,对于每一个主键我们需要一个版本号,那么多个副本中相同的主键,我们就需要维护一个版本号向量,通过这个向量来维护多版本的并发写入。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>算法训练-链表问题</title>
+      <link>http://jueyoq.top/2019/linked_list/</link>
+      <pubDate>Sat, 10 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://jueyoq.top/2019/linked_list/</guid>
+      <description>&lt;p&gt;本篇将介绍关于链表算法的基本解体思路与经典问题,本篇不仅仅追求的是写出优秀的链表代码,更在意的是在有限时间内,如何写出&lt;code&gt;bug free&lt;/code&gt;的链表代码。&lt;/p&gt;
+
+&lt;h2 id=&#34;链表问题的一般解题思路&#34;&gt;链表问题的一般解题思路:&lt;/h2&gt;
+
+&lt;p&gt;链表是一种利用不连续的内存块,通过在每块内存中存储下一块内存的指针而构造的线性存储结构,所以链表是线性表的一种形式。
+   链表问题是一种考察基本编码能力的问题,这类问题的特点是解法并不复杂,难点在于证明解法的正确性,以及如何编码。即,考察是否能编写出  &lt;strong&gt;&lt;code&gt;bug free&lt;/code&gt;&lt;/strong&gt;  的代码,少数会考察算法的数学证明问题。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;使用画图的技巧,释放一部分大脑空间。通过画出几个小规模的实例来思考问题,如果问题需要三个以上指针才能解决,那么画图的时间成本,是可以被接受的。&lt;/li&gt;
+&lt;li&gt;通过画出一般情况下的案例,思考算法的主体解体思路。一般是3-5个节点的情况下。&lt;/li&gt;
+&lt;li&gt;这时,更重要的是不要马上编码,而是在举出几个特殊实例,来验证一般思路在特殊场景下是否健壮,一般是0,1,2,3,4个数的链表节点,以及链表指针在头节点,与尾节点是否能正常工作。&lt;/li&gt;
+&lt;li&gt;一定要有耐心，不要图快而提交代码,链表问题就是在锻炼你的代码review能力,思路很简单,难点在于耐下心来,冷静的分析。相信我,你总是能找到第一次编码中的问题。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;那么什么是一般性的思路呢？&lt;/strong&gt;
+这是一种模式,链表问题的算法思想就是那么几种,掌握后套用即可,数学证明看几道典型案例即可,真正的难点在于编码,链表问题是涉及指针操作,极易出错,写出 &lt;strong&gt;&lt;code&gt;bug free&lt;/code&gt;&lt;/strong&gt; 是很不容的事情,所以最重要的就是要多加练习。&lt;/p&gt;
+
+&lt;h2 id=&#34;1-设计单链表&#34;&gt;1.设计单链表&lt;/h2&gt;
+
+&lt;p&gt;这里利用了&lt;a href=&#34;https://www.zhihu.com/question/27155932&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;哨兵&lt;/a&gt;的思想&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class MyLinkedList:
+
+    def __init__(self):
+        &amp;quot;&amp;quot;&amp;quot;
+        初始化一个链表,使用一个永不存数据的节点作为哨兵,
+        这样可以简化,在插入删除操作中对头节点与尾节点插入时的条件判读,
+        进而提高速度。
+        &amp;quot;&amp;quot;&amp;quot;
+        self.sb = ListNode(-1)
+        self.le = 0
+
+
+    def get(self, index):
+        &amp;quot;&amp;quot;&amp;quot;
+        通过索引获取链表中的节点。
+        &amp;quot;&amp;quot;&amp;quot;
+        head = self.sb.next
+        if  index &amp;lt; 0 or index &amp;gt;= self.le or head == None:
+            return -1
+        for i in range(index):
+            head = head.next
+        return head.val
+
+
+    def addAtHead(self, val):
+        &amp;quot;&amp;quot;&amp;quot;
+        在头节点的位置插入节点,哨兵思想使其不用判读非空情况。
+        &amp;quot;&amp;quot;&amp;quot;
+        head = self.sb.next
+        self.sb.next = ListNode(val)
+        self.sb.next.next = head
+        self.le += 1
+
+
+    def addAtTail(self, val):
+        &amp;quot;&amp;quot;&amp;quot;
+        在尾部插入节点
+        &amp;quot;&amp;quot;&amp;quot;
+        tmp = self.sb
+        for i in range(self.le):
+            tmp = tmp.next
+        tmp.next = ListNode(val)
+        self.le += 1
+
+
+    def addAtIndex(self, index, val):
+        &amp;quot;&amp;quot;&amp;quot;
+        在指定索引的位置插入节点
+        &amp;quot;&amp;quot;&amp;quot;
+        if  index &amp;lt; 0 or index &amp;gt; self.le :
+            return -1
+        pre = self.sb
+        for i in range(index):
+            pre  = pre.next
+        tmp = pre.next
+        pre.next = ListNode(val)
+        pre.next.next = tmp
+        self.le += 1
+
+
+    def deleteAtIndex(self, index):
+        &amp;quot;&amp;quot;&amp;quot;
+        指定index的位置删除节点
+        &amp;quot;&amp;quot;&amp;quot;
+        if index &amp;lt; 0 or index &amp;gt;= self.le:
+            return
+        pre = self.sb
+        for  i in range(index) :
+            pre = pre.next
+        pre.next = pre.next.next
+        self.le -= 1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;2-判断链表是否有环&#34;&gt;2.判断链表是否有环&lt;/h2&gt;
+
+&lt;p&gt;双指针思想经典三问:判读链表是否有环,链表与环的交点,求环的长度。定义两个指针,从头开始,一个每次走2步,一个走一步,二者相交则有环,不相交走两步的指针先到尾部,则判读无环。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution(object):
+    def hasCycle(self, head):
+        if head is None or head.next is None:
+            return False
+        fast ,slow = head,head
+        while fast is not  None and fast.next is not None:
+            fast = fast.next.next
+            slow = slow.next
+            if slow == fast:
+                return True
+        return False
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;3-判断环的入口点&#34;&gt;3.判断环的入口点&lt;/h2&gt;
+
+&lt;p&gt;快慢指针相遇后,将快指针重新指向头节点,两个指针开始同时走,每次走一步。当再次相遇时,即是环的入口点。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;
+class Solution(object):
+    def detectCycle(self, head):
+        if head == None or head.next == None:
+            return None
+        fast = head.next.next
+        slow = head.next
+        while fast != None and fast.next != None:
+            fast = fast.next.next
+            slow = slow.next
+            if fast == slow:
+                break
+        if fast == None or fast.next == None:
+            return None
+        fast = head
+        while fast != slow:
+            fast = fast.next
+            slow = slow.next
+        return fast
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;4-求解环的长度&#34;&gt;4.求解环的长度&lt;/h2&gt;
+
+&lt;p&gt;求出相遇点,一个指针继续走,每次一步,记录走的次数,另一个指针原地不动,再次相遇次数就是长度。很简单,脑补吧。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;  pass
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;那么问题来了,上述前两个算法正确吗,如何用数学证明呢？&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;a href=&#34;https://zhuanlan.zhihu.com/p/33663488&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;链表有环算法证明&lt;/a&gt;:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;5-求两个链表相交点&#34;&gt;5.求两个链表相交点&lt;/h2&gt;
+
+&lt;p&gt;两个指针,分别指向两个链表的头,当不断的往前走,当谁到了尾部,则回到另一个链表的头部。相交的链表,
+先到尾部的一定是短的链表,回到长链表的头部,当长链表出发的指针也到尾时,其已经走过了正好是差一步到长短链表相差的节点数,此时长链表指针回到短链表的头部,二者位置对齐,在此向前走,最终相遇,即为交点。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution(object):
+    def getIntersectionNode(self, headA, headB):
+        p1 ,p2 = headA,headB
+        while p1 != p2:
+            p1 = headB if p1 == None else p1.next
+            p2 = headA if p2 == None else p2.next
+        return p1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;6-删除单链表的第n个倒数节点&#34;&gt;6.删除单链表的第n个倒数节点&lt;/h2&gt;
+
+&lt;p&gt;两个指针,一个先走n步,然后两个指针再一起走,当先走的指针到达尾部,则后走的指针为待删除节点前驱节点。倒数第n,其实就是正数第L-n+1,L为链表长度,所以L-n正好是,要删除节点的前驱。先走n步,之后再走的就是L-n了,这样第二指针正好就是在第L-n的节点处。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution(object):
+    def removeNthFromEnd(self, head, n):
+        pre ,last = head,head
+        for i in range(n):
+            pre = pre.next
+        if pre == None:
+            return head.next
+        while pre.next != None:
+            pre = pre.next
+            last = last.next
+        last.next = last.next.next
+        return head
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;7-单链表反转&#34;&gt;7.单链表反转&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://blog.csdn.net/feliciafay/article/details/6841115&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;两个指针实现c版:&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;
+class Solution(object):
+    def reverseList(self, head):
+        &amp;quot;&amp;quot;&amp;quot;
+        使用三个指针,完成单链表操作。
+        &amp;quot;&amp;quot;&amp;quot;
+        if head == None:
+            return None
+        pre = None
+        next = head.next
+        while head != None:
+            head.next = pre
+            pre = head
+            head = next
+            if next != None:
+                next = next.next
+        return pre
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;8-移除链表中的所有值为val的元素&#34;&gt;8.移除链表中的所有值为val的元素&lt;/h2&gt;
+
+&lt;p&gt;考虑边界条件,例外情况,第一次循环是关键,通过考察0,1,2,3节点数的链表得到遍历前驱删除Val的方法,
+无法适应头节点以及头节点是连续需要删除的Val的情况。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution(object):
+    def removeElements(self, head, val):
+        if head == None:
+            return None   
+        while head != None and head.val == val:
+            if head.next == None:
+                return None
+            else:
+                head = head.next
+        pre = head
+        while pre.next != None:
+            if pre.next.val == val:
+                pre.next = pre.next.next
+            else:
+                pre = pre.next
+        return head
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;9-奇偶链表&#34;&gt;9.奇偶链表&lt;/h2&gt;
+
+&lt;p&gt;通过两个指针相互next,交错前进,巧妙的实现奇偶节点的独立遍历,然后将其独自串联,并合并。
+难点在于指针关系不要搞错,可以使用画图的技巧辅助思考,链表问题考验编程实现能力,要沉得住气,耐心检查这才是关键。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution(object):
+
+    def oddEvenList(self, head):
+        if head is None:
+            return head
+        odd = head
+        even = head.next
+        if even is None:
+            return head
+        odd_prev = odd
+        even_prev = even
+        even_head = even
+        while even is not None and even.next is not None:
+            odd = even.next
+            even = odd.next
+            odd_prev.next = odd
+            even_prev.next = even
+            odd_prev = odd
+            even_prev = even
+        odd.next = even_head
+        return head
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;10-回文链表&#34;&gt;10.回文链表&lt;/h2&gt;
+
+&lt;p&gt;快慢指针找到中点,将后半部分链表逆序,再次从头和中点位置遍历链表,逐一比较其值来判断回文。这里的重点是在编码过程中适当的抽象,可以简化代码逻辑,大大提高编写代码的正确性和可读性。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution(object):
+    def isPalindrome(self, head):
+        if head is None or head.next is None:
+            return True
+        mid = self.getMid(head)
+        mid.next = self.getFanZhuan(mid.next)
+        p,q = head,mid.next
+        while q is not None and p.val == q.val:
+            q = q.next
+            p = p.next
+        self.getFanZhuan(mid.next)
+        return q == None
+    def getMid(self,head):
+        fast,slow = head.next,head
+        while fast is not None and fast.next is not None:
+            fast = fast.next.next
+            slow = slow.next
+        return slow
+    def getFanZhuan(self,head):
+        if head is None or head.next is None:
+            return head
+        pre,curr,next = None,head,head.next
+        while curr is not None:
+            curr.next = pre
+            pre = curr
+            curr = next
+            next = None if next is None else next.next
+        return pre
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;11-双链表设计&#34;&gt;11.双链表设计&lt;/h2&gt;
+
+&lt;p&gt;双链表的设计要比单链表还要复杂一些,但是如果领会哨兵在链表中的运用的话,那么还是很轻松的,不过这道题我居然做了3天,好吧我每天早上七点半会做一道题.总共应该花了40分钟,还是我太菜了,还有就是当设计数据结构这种题,要编写多个方法,我们在review代码时,还要考虑多个函数相互调用的影响,
+也就是类级别的“不变式”,需要深入的思考每个行为的作用,仔细理解每个行为发生的前置后置条件,以及在整个对象生命周期中都要维护的一种不变的状态是什么。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class MyLinkedList(object):
+
+    def __init__(self):
+        &amp;quot;&amp;quot;&amp;quot;
+        Initialize your data structure here.
+        &amp;quot;&amp;quot;&amp;quot;
+        self.head = ListNode(-1)
+        self.tail = ListNode(-1)
+        self.head.next = self.tail
+        self.tail.prev = self.head
+        self.length = 0
+
+
+    def get(self, index):
+        &amp;quot;&amp;quot;&amp;quot;
+        Get the value of the index-th node in the linked list. If the index is invalid, return -1.
+        :type index: int
+        :rtype: int
+        &amp;quot;&amp;quot;&amp;quot;
+        if index &amp;lt; 0 or index &amp;gt;= self.length:
+            return -1
+        return self.getNode(index).val
+
+
+    def getNode(self,index):
+        frist = self.head.next
+        for i in range(index):
+            frist = frist.next
+        return frist                                                                                
+
+
+    def addAtHead(self, val):
+        &amp;quot;&amp;quot;&amp;quot;
+        Add a node of value val before the first element of the linked list. After the insertion, the new node will be the first node of the linked list.
+        :type val: int
+        :rtype: void
+        &amp;quot;&amp;quot;&amp;quot;
+        frist = self.head.next
+        node = ListNode(val)
+        self.head.next = node
+        node.prev = self.head
+        node.next = frist
+        frist.prev = node
+        self.length += 1
+
+
+    def addAtTail(self, val):
+        &amp;quot;&amp;quot;&amp;quot;
+        Append a node of value val to the last element of the linked list.
+        :type val: int
+        :rtype: void
+        &amp;quot;&amp;quot;&amp;quot;
+        last = self.tail.prev
+        node = ListNode(val)
+        self.tail.prev = node
+        node.next = self.tail
+        last.next = node
+        node.prev = last
+        self.length += 1
+
+
+    def addAtIndex(self, index, val):
+        &amp;quot;&amp;quot;&amp;quot;
+        Add a node of value val before the index-th node in the linked list. If index equals to the length of linked list, the node will be appended to the end of linked list. If index is greater than the length, the node will not be inserted.
+        :type index: int
+        :type val: int
+        :rtype: void
+        &amp;quot;&amp;quot;&amp;quot;
+        if index &amp;lt; 0 or index &amp;gt; self.length:
+            return
+        if index == self.length:
+            self.addAtTail(val)
+            return
+        old = self.getNode(index)
+        node = ListNode(val)
+        pre = old.prev
+        pre.next = node
+        node.prev = pre
+        node.next = old
+        old.prev = node
+        self.length += 1
+
+
+    def deleteAtIndex(self, index):
+        &amp;quot;&amp;quot;&amp;quot;
+        Delete the index-th node in the linked list, if the index is valid.
+        :type index: int
+        :rtype: void
+        &amp;quot;&amp;quot;&amp;quot;
+        if index &amp;lt; 0 or index &amp;gt;= self.length:
+            return
+        node = self.getNode(index)
+        pre = node.prev
+        next = node.next
+        pre.next = next
+        next.prev = pre
+        node.next = None
+        node.prev = None
+        self.length -= 1
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;12-拼接两个有序链表&#34;&gt;12.拼接两个有序链表&lt;/h2&gt;
+
+&lt;p&gt;此题关键是对例外情况的处理,两个输入的链表可能都为空,可能长短不一。都需要单独处理&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution(object):
+    def mergeTwoLists(self, l1, l2):
+        if l1 is None and l2 is None:
+            return None
+        elif l1 is None:
+            return l2
+        elif l2 is None:
+            return l1
+        sb ,headA,headB = ListNode(-1),l1,l2
+        headSB = sb
+        while headA  and  headB :
+            if headA.val &amp;gt; headB.val:
+                sb.next = headB
+                headB = headB.next
+            elif headA.val &amp;lt; headB.val:
+                sb.next = headA
+                headA = headA.next
+            else:
+                sb.next = headA
+                headA = headA.next
+                sb = sb.next
+                sb.next = headB
+                headB = headB.next
+            sb = sb.next
+        if headA:
+            sb.next = headA
+        elif headB:
+            sb.next = headB
+        return headSB.next
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;13-将两个逆序链表表示的数字相加&#34;&gt;13.将两个逆序链表表示的数字相加&lt;/h2&gt;
+
+&lt;p&gt;此题使用哨兵简化了代码,同时注意对进位的处理,
+还是非常好做的。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution(object):
+    def addTwoNumbers(self, l1, l2):
+        rem = 0
+        dummy = ListNode(0)
+        p = dummy
+        while l1 or l2 or rem:
+            s = (l1.val if l1 else 0)  + (l2.val if l2 else 0) + rem
+            rem = s/10
+            p.next = ListNode(s%10)
+            p = p.next
+            if l1:
+                l1 = l1.next
+            if l2:
+                l2 = l2.next
+        return dummy.next
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;14-扁平化多级双向链表&#34;&gt;14.扁平化多级双向链表&lt;/h2&gt;
+
+&lt;p&gt;具体解释看&lt;a href=&#34;https://leetcode-cn.com/problems/flatten-a-multilevel-doubly-linked-list/description/&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;这里&lt;/a&gt;
+此题重点考察,对指针的处理,可以画图辅助思考,遍历链表主体,没有子链表则继续遍历。
+整个程序在一个循环内完成。有子链表则遍历子链表,得到子链表的头与尾的指针,将子链表的尾节点的next指向主体链表当前指针的next,如果此next不空,则将其prev指针指向子链表的尾节点,然后再次更新子链表的头节点,使其当前主链表遍历节点的next指针指向子链表的头节点,并且子链表头节点prev指针反过来指向它,并将其指向子孩子的指针赋值为None,将当前指针直接指向合并后子链表的尾指针的next,以此减少其遍历次数。往复迭代,具体可根据代码,画图理解。此题复杂在指针比较多,画图赋值分析,是写出&lt;code&gt;bug free&lt;/code&gt;的关键。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution(object):
+        if not head:
+            return None
+        p = head
+        while p:
+            if not p.child:
+                p = p.next
+                continue
+
+            p1 = p.child
+            p2 = p.child
+            while p2.next:
+                p2 = p2.next
+
+            p2.next = p.next
+            if p.next:
+                p.next.prev = p2
+            p.next = p1
+            p1.prev = p
+            p.child = None
+            p = p1
+
+        return head
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;15-复制带随机指针的链表&#34;&gt;15.复制带随机指针的链表&lt;/h2&gt;
+
+&lt;p&gt;此题关键是对随机指针的理解,复制节点的时候对随机指针的复制是相对的,必须保证随机指针指向的节点相对不变。详情点击&lt;a href=&#34;https://leetcode-cn.com/problems/copy-list-with-random-pointer/description/&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;这里&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution(object):
+    def copyRandomList(self, head):
+        if not head:
+            return None
+        p = head
+        while p:
+            tmp = RandomListNode(p.label)
+            tmp.next = p.next
+            p.next = tmp
+            p = tmp.next
+        p = head
+        while p:
+            if p.random:
+                p.next.random = p.random.next
+            p = p.next.next
+        n,o = head.next,head
+        new = n
+        while n:
+            o.next = n.next
+            o = o.next
+            if not o:
+                break
+            n.next = o.next
+            n = n.next
+        return new
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;16-旋转链表&#34;&gt;16.旋转链表&lt;/h2&gt;
+
+&lt;p&gt;此题最好的解法可以在常数空间,线性时间完成.先整体逆序,在找到分区点,对两部分分别逆序。注意的是,逆序时要指定尾指针,因为链表时连续的&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution(object):
+    def rotateRight(self, head, k):
+
+        if head is None:
+            return None
+        if k == 0:
+            return head
+        count = 0
+        end = None
+        tmp = head
+        while tmp:
+            tmp = tmp.next
+            count += 1
+        head = self.nx(head,end)
+        k = k % count
+        tmp = head
+        while k != 0:
+            tmp = tmp.next
+            k -= 1
+            end = tmp
+        new_head = self.nx(head,end)
+        head.next = self.nx(end,None)
+        return new_head
+
+
+    def nx(self,head,end):
+        if head is None:
+            return None
+        pre,curr,next = None,head,head.next
+        while curr != end:
+            curr.next = pre
+            pre = curr
+            curr = next
+            next = next.next if next else None
+        return pre
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;17-有序链表转换二叉搜索树&#34;&gt;17.有序链表转换二叉搜索树&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://leetcode-cn.com/problems/convert-sorted-list-to-binary-search-tree/description/&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;详情&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;此题本质就是对线性结构与树结构关系的考察,如何用线性结构存储一个二叉搜索树？有序的线性表即可,线性表可以是数组,也可以是链表。如此的话,如何用有序线性表反过来构造二叉搜索树？ 二分法是关键,二分法就是有序线性表与二叉搜索的映射关系,那么如何取二分法中点？数组可以计算index下标,链表就可以用快慢指针,ok 此时问题已经解决,请看代码。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution(object):
+    def sortedListToBST(self, head):
+        return self.insterC(head,None)
+    def insterC(self,head,tail):
+        if head is tail:
+            return None
+        if head.next is tail:
+            return TreeNode(head.val)
+        fast = mid = head
+        while fast is not tail and fast.next is not tail:
+                mid = mid.next
+                fast = fast.next.next
+        tree = TreeNode(mid.val)
+        tree.left = self.insterC(head,mid)
+        tree.right = self.insterC(mid.next,tail)
+        return tree
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;18-两两交换链表中的节点&#34;&gt;18.两两交换链表中的节点&lt;/h2&gt;
+
+&lt;p&gt;此题类似链表逆序的思想,不过只要正确理解链表指针的关系,关注前驱,当前节点,后继三者的变换。注意检查代码,对边界条件的检查,例外情况的分析即可写出&lt;code&gt;bug free&lt;/code&gt;,重点在于耐心,要有沉得住气。
+&lt;a href=&#34;https://leetcode-cn.com/problems/swap-nodes-in-pairs/description/&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;详情&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;
+class Solution(object):
+    def swapPairs(self, head):
+        if head is None:
+            return head
+        sb = ListNode(-1)
+        sb.next = head
+        a = sb
+        b = head
+        c = head.next
+        while c:
+            a.next = c
+            b.next = c.next
+            c.next = b
+            a = b
+            b = b.next
+            if b is None:
+                break
+            c = b.next
+        return sb.next
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;19-排序链表&#34;&gt;19.排序链表&lt;/h2&gt;
+
+&lt;p&gt;此题本质上就是对归并排序的链表实现,题目要求O(nlong),链表实现归并排序的优势就是可以在常数空间下完成归并,缺点是查询中点不能想数组一样在常数时间内完成,所以其性能上比数组形式慢一些,但也在同一数量级,并且不需要连续空间存储,以及额外空间,某些情况下也是一个不错的选择。
+&lt;a href=&#34;https://leetcode-cn.com/problems/sort-list/description/&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;详情&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution(object):
+    def sortList(self, head):
+        if head is None or head.next is None :
+            return head
+
+        mid =  self.getMid(head)
+        left = self.sortList(head)
+        right = self.sortList(mid)
+        return self.merge(left,right)
+
+
+    def getMid(self,head):
+        m,k = head,head
+        sb = ListNode(-1)
+        sb.next = head
+        while k and k.next:
+            k = k.next.next
+            m = m.next
+            sb = sb.next
+        sb.next = None
+        return m
+
+
+    def merge(self,a,b):
+        sb = ListNode(-1)
+        curr = sb
+        while a and b:
+            if a.val &amp;gt;= b.val:
+                curr.next = b
+                b = b.next
+            else:
+                curr.next = a
+                a = a.next
+            curr = curr.next
+        if a:
+            curr.next = a
+        elif b:
+            curr.next = b
+        return sb.next
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;20-重排链表&#34;&gt;20.重排链表&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://leetcode-cn.com/problems/reorder-list/description/&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;详情&lt;/a&gt;
+此题关键在于正确理解题意,写几个测试用例体会一下发现其是三种常见链表行为的组合,获取链表中点,逆序链表,交叉合并链表。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution(object):
+    def reorderList(self, head):
+        if not head or not head.next:
+            return
+        if not head.next.next:
+            return
+
+        mid = self.get_mid(head)
+        head1 =  self.nx(mid)
+        head =  self.marge(head,head1)
+
+    def get_mid(self,head):
+        pre = ListNode(-1)
+        pre.next = head
+        fast,slow = head,head
+        while fast and fast.next:
+            fast = fast.next.next
+            slow = slow.next
+            pre = pre.next
+        pre.next = None
+        return slow
+
+    def nx(self,head):
+        pre, cur, next = None,head,head.next
+        while cur:
+            cur.next = pre
+            pre = cur
+            cur = next
+            if next:
+                next = next.next
+        return pre
+
+    def marge(self,head1,head2):
+        dummy = ListNode(-1)
+        d = dummy
+        p, q = head1,head2
+        while p and q:
+            d.next = p
+            p = p.next
+            d = d.next
+
+            d.next = q
+            q = q.next
+            d = d.next
+        if q:
+            d.next = q
+        elif p:
+            d.next = p
+        return dummy.next
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;21-链表组件-https-leetcode-cn-com-problems-linked-list-components-description&#34;&gt;21.&lt;a href=&#34;https://leetcode-cn.com/problems/linked-list-components/description/&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;链表组件&lt;/a&gt;&lt;/h2&gt;
+
+&lt;p&gt;理解题中定义组件的概念的解题的关键,利用map key的特性以及确定计数策略即可解题,此题关键在于正确理解新概念,并识别出算法中经典的模式-集合查找。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution:
+    def numComponents(self, head, G):
+        if head is None or len(G) == 0:
+            return 0
+        count = 0
+        cur = head
+        GMap = {}
+        for v in G:
+            GMap[v] = 0
+        while cur:
+            if cur.val in GMap and (cur.next is None or cur.next.val not in GMap):
+                count += 1                
+            cur = cur.next
+        return count
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;22-分隔链表01-https-leetcode-cn-com-problems-split-linked-list-in-parts-description&#34;&gt;22.&lt;a href=&#34;https://leetcode-cn.com/problems/split-linked-list-in-parts/description/&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;分隔链表01&lt;/a&gt;&lt;/h2&gt;
+
+&lt;p&gt;分成两步求解,第一找到分割规则。
+第二按规则切分。
+根据题意规则很简单,就是先平分再均摊余数
+此类问题在于找到规律,将其数学化表达并封装好操作行为。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution:
+    def splitListToParts(self, root, k):
+        p = root
+        size = 1
+        while p and p.next:
+            size += 1
+            p = p.next
+        mod = size % k
+        num = int(size / k)
+        res = []
+
+        tmp = root
+        while k != 0:
+            if mod != 0:
+                root = self.splitListNodeByLen(tmp,num+1)
+                mod -= 1
+            else:
+                root = self.splitListNodeByLen(tmp,num)
+            res.append(tmp)
+            tmp = root
+            k -= 1
+        return res
+
+
+    def splitListNodeByLen(self,root,l):
+        if not root or l &amp;lt;= 0:
+            return root
+        pre = None
+        while l &amp;gt; 0:
+            pre = root
+            root = root.next
+            l -= 1
+        pre.next = None
+        return root
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;23-两数相加-ii-https-leetcode-cn-com-problems-add-two-numbers-ii-description&#34;&gt;23.&lt;a href=&#34;https://leetcode-cn.com/problems/add-two-numbers-ii/description/&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;两数相加 II&lt;/a&gt;&lt;/h2&gt;
+
+&lt;p&gt;此题是连表相加的升级版,连表不再逆序需要自行处理,解体模式即是先一般到特殊的处理方式,此题我的解法比较糟糕,没有借鉴最佳实践,只是我自己想出来的,既然无法从低位开始,又是运算问题,直接想到使用栈这种辅助结构来处理。
+但是期间引入的额外的复杂性,之后再想如何优化。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution:
+    def addTwoNumbers(self, l1, l2):
+        s1, s2 = [], []
+        tmp1 ,tmp2 = l1, l2
+        while tmp1:
+            s1.append(tmp1.val)
+            tmp1 = tmp1.next
+        while tmp2:
+            s2.append(tmp2.val)
+            tmp2 = tmp2.next
+        c = 0
+        node = ListNode(-1)
+        root = node
+        while len(s1) != 0 and len(s2) != 0:
+            num = s1[-1] + s2[-1] + c
+            s1 = s1[:len(s1)-1]
+            s2 = s2[:len(s2)-1]
+            if num &amp;gt;= 10:
+                node.val = num - 10
+                c = 1
+            else:
+                node.val = num
+                c = 0
+            if len(s1) == 0 and len(s2) == 0:
+                if c == 1:
+                    node.next = ListNode(-1)
+                    node = node.next
+                    node.val =  c
+                break
+            node.next = ListNode(-1)
+            node = node.next
+
+        while len(s1) != 0:
+            num = s1[-1] + c
+            if num &amp;gt;= 10:
+                node.val = num - 10
+                c = 1
+            else:
+                node.val = num
+                c = 0
+            s1 = s1[:len(s1)-1]
+            if len(s1) == 0:
+                if c == 1:
+                    node.next = ListNode(-1)
+                    node = node.next
+                    node.val = c
+                break
+            node.next = ListNode(-1)
+            node = node.next
+
+        while len(s2) != 0:
+            num = s2[-1] + c
+            if num &amp;gt;= 10:
+                node.val = num - 10
+                c = 1
+            else:
+                node.val = num
+                c = 0
+            s2 = s2[:len(s2)-1]
+            if len(s2) == 0:
+                if c == 1:
+                    node.next = ListNode(-1)
+                    node = node.next
+                    node.val = c
+                break
+            node.next = ListNode(-1)
+            node = node.next
+        return self.nx(root)
+
+    def nx(self,root):
+        if root is None:
+            return None
+        pre = None
+        next = root.next
+        while root:
+            root.next = pre
+            pre = root
+            root = next
+            if next:
+                next = next.next
+        return pre
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;24-分隔链表02-https-leetcode-cn-com-problems-partition-list-description&#34;&gt;24.&lt;a href=&#34;https://leetcode-cn.com/problems/partition-list/description/&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;分隔链表02&lt;/a&gt;&lt;/h2&gt;
+
+&lt;p&gt;此题是 快排分区中的连表实现。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution:
+    def partition(self, head, x):
+        h1,h2 = ListNode(-1),ListNode(-1)
+        dummy = ListNode(-1)
+        dummy.next = head
+        pre = dummy
+        tmp1,tmp2 = h1,h2
+        while pre and pre.next:
+            tmp = pre.next
+            pre.next = None
+            pre = tmp
+            if tmp.val &amp;gt;= x:
+                tmp1.next = tmp
+                tmp1 = tmp1.next
+            else:
+                tmp2.next = tmp
+                tmp2 = tmp2.next
+        tmp2.next = h1.next
+        return h2.next
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;25-反转链表-ii-https-leetcode-cn-com-problems-reverse-linked-list-ii-description&#34;&gt;25.&lt;a href=&#34;https://leetcode-cn.com/problems/reverse-linked-list-ii/description/&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;反转链表 II&lt;/a&gt;&lt;/h2&gt;
+
+&lt;p&gt;此题指针较多画图辅助更加高效。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution:
+    def reverseBetween(self, head, m, n):
+        count = 0
+        dummy = ListNode(-1)
+        pre = dummy
+        pre.next = head
+        while count &amp;lt; m-1:
+            pre = pre.next
+            count += 1
+        last = pre
+        while count &amp;lt; n:
+            last = last.next
+            count += 1
+        cur = pre.next
+        next = last.next
+        self.reverse(cur, last)
+        pre.next = last
+        head = dummy.next
+        cur.next = next
+        return head
+    def reverse(self, cur,last):
+        last.next = None;
+        pre = None
+        next = cur.next
+        while cur:
+            cur.next = pre
+            pre = cur
+            cur = next
+            if next:
+                next = next.next
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;26-两数相加&#34;&gt;26.两数相加&lt;/h2&gt;
+
+&lt;p&gt;运用哨兵模式&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution(object):
+    def addTwoNumbers(self, l1, l2):
+        &amp;quot;&amp;quot;&amp;quot;
+
+        &amp;quot;&amp;quot;&amp;quot;
+        rem = 0
+        dummy = ListNode(0)
+        p = dummy
+        while l1 or l2 or rem:
+            s = (l1.val if l1 else 0)  + (l2.val if l2 else 0) + rem
+            rem = s/10
+            p.next = ListNode(s%10)
+            p = p.next
+            if l1:
+                l1 = l1.next
+            if l2:
+                l2 = l2.next
+        return dummy.next
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;27-plus-one-linked-list-连表加1运算&#34;&gt;27.Plus One Linked List(连表加1运算)&lt;/h2&gt;
+
+&lt;p&gt;leetCode付费题,很简单但很巧妙。不是我想的&lt;a href=&#34;http://www.cnblogs.com/grandyang/p/5626389.html&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;原文&lt;/a&gt;
+思路是遍历链表，找到右起第一个不为9的数字，如果找不到这样的数字，说明所有数字均为9，那么在表头新建一个值为0的新节点，进行加1处理，然后把右边所有的数字都置为0即可。举例来说：
+比如1-&amp;gt;2-&amp;gt;3，那么第一个不为9的数字为3，对3进行加1，变成4，右边没有节点了，所以不做处理，返回1-&amp;gt;2-&amp;gt;4。
+再比如说8-&amp;gt;9-&amp;gt;9，找第一个不为9的数字为8，进行加1处理变成了9，然后把后面的数字都置0，得到结果9-&amp;gt;0-&amp;gt;0。
+再来看9-&amp;gt;9-&amp;gt;9的情况，找不到不为9的数字，那么再前面新建一个值为0的节点，进行加1处理变成了1，把后面的数字都置0，得到1-&amp;gt;0-&amp;gt;0-&amp;gt;0。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;class Solution {
+public:
+    ListNode* plusOne(ListNode* head) {
+        ListNode *cur = head, *right = NULL;
+        while (cur) {
+            if (cur-&amp;gt;val != 9) right = cur;
+            cur = cur-&amp;gt;next;
+        }
+        if (!right) {
+            right = new ListNode(0);
+            right-&amp;gt;next = head;
+            head = right;
+        }
+        ++right-&amp;gt;val;
+        cur = right-&amp;gt;next;
+        while (cur) {
+            cur-&amp;gt;val = 0;
+            cur = cur-&amp;gt;next;
+        }
+        return head;
+    }
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;28-design-phone-directory-设计电话字典&#34;&gt;28.Design Phone Directory（设计电话字典)&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://www.cnblogs.com/grandyang/p/5735205.html&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;这里&lt;/a&gt;,讲的很清楚,不用我再说了,主要考察数据结构的设计,事实上,这种问题先根据经验想最常见的结构是否可以满足要求,不足则尝试组合数据结构,关键是定义你要知道哪些信息才能使你离正确答案更近一步,这需要练习与总结。&lt;/p&gt;
+
+&lt;h2 id=&#34;9-convert-binary-search-tree-to-sorted-doubly-linked-list&#34;&gt;9.Convert Binary Search Tree to Sorted Doubly Linked List&lt;/h2&gt;
+
+&lt;p&gt;将一颗二叉搜索树,转换为一个循环双连表。
+非常经典的一道题,LeetCode收费,没办法OJ做,本地只有go的环境。所以用go写了个解。
+此题利用分治思想,递归实现。原问题的模式可以看成:左子树成环 与 根成环合并,再与右子树成环合并。如此,子问题就是: 1. &amp;ldquo;左子树 根 右子树&amp;rdquo;成环,2.合并。递归基显然为根节点为空,直接返回。递归的部分就是:左,右成环.每次递归完成的事情就是: 将根成环,合并左根右三个环，合并动作就是将两个循环链表合并成一个连表的函数。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;type TreeNode struct {
+	Left  *TreeNode
+	Right *TreeNode
+	Val   int
+}
+func BST2DLL(root *TreeNode) *TreeNode {
+	if root == nil{
+		return nil
+	}
+	aLast  := BST2DLL(root.Left)
+	bLast := BST2DLL(root.Right)
+	root.Left = root
+	root.Right = root
+	aLast = Append(aLast,root)
+	aLast = Append(aLast,bLast)
+	return aLast
+}
+func Append(a,b *TreeNode) *TreeNode  {
+	if a == nil{
+		return b
+	}
+	if b == nil{
+		return a
+	}
+	 aLast := a.Left
+	 bLast := b.Left
+	 Join(aLast, b)
+	 Join(bLast, a)
+	return a
+}
+func Join(a, b *TreeNode) {
+	a.Right = b
+	b.Left = a
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;30-insert-into-a-cyclic-sorted-list-在循环有序的链表中插入结点&#34;&gt;30.Insert into a Cyclic Sorted List 在循环有序的链表中插入结点&lt;/h2&gt;
+
+&lt;p&gt;这道题,就是考察多种情况的分析,第一种若是空链表时,插入值在最大与最小之间,小于最小或者大于最大时。将不同的情况考虑清楚即可。按照数轴。&lt;a href=&#34;http://www.cnblogs.com/grandyang/p/9981163.html&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;&lt;strong&gt;这里&lt;/strong&gt;&lt;/a&gt;很详细&lt;/p&gt;
+
+&lt;h2 id=&#34;31-k个一组翻转链表-https-leetcode-cn-com-problems-reverse-nodes-in-k-group-description-利用哨兵减少指针操作-利用k作为计数器控制pre-left-right边界指针进行操作-根据计数器移动指针到正确位置-翻转链表-方法比较笨拙但是简单有效哈哈-以后有时间在优化-现在我还是尽量多涮题-见识更多的类型-收集更多数据先训练个基本模型&#34;&gt;31.&lt;a href=&#34;https://leetcode-cn.com/problems/reverse-nodes-in-k-group/description/&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;k个一组翻转链表&lt;/a&gt;利用哨兵减少指针操作,利用k作为计数器控制pre,left,right边界指针进行操作。根据计数器移动指针到正确位置,翻转链表。方法比较笨拙但是简单有效哈哈,以后有时间在优化,现在我还是尽量多涮题,见识更多的类型,收集更多数据先训练个基本模型。&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution:
+    def reverseKGroup(self, head, k):
+        &amp;quot;&amp;quot;&amp;quot;
+        :type head: ListNode
+        :type k: int
+        :rtype: ListNode
+        &amp;quot;&amp;quot;&amp;quot;
+        if k &amp;lt;= 0 or not head or not head.next:
+            return head
+        dummy = ListNode(-1)
+        dummy.next = head
+        cur = head
+        pre = dummy
+        while cur:
+            left,right = cur,cur
+            for i in range(k-1):
+                cur = cur.next
+                if cur is None:
+                    return dummy.next
+                right = cur
+            self.nx(pre,left,right)
+            cur = left
+            pre = left
+            cur = cur.next
+        return dummy.next
+    def nx(self,pre,l,r):
+        if not pre or not l or not r or l == r:
+            return l
+        p ,cur,next = pre,l,l.next
+        tmp = r.next
+        while cur != tmp:
+            cur.next = p
+            p = cur
+            cur = next
+            if next:
+                next = next.next
+        pre.next = p
+        l.next = tmp
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;32-合并k个排序链表-https-leetcode-cn-com-problems-merge-k-sorted-lists-description&#34;&gt;32.&lt;a href=&#34;https://leetcode-cn.com/problems/merge-k-sorted-lists/description/&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;合并K个排序链表&lt;/a&gt;&lt;/h2&gt;
+
+&lt;p&gt;此题可以做的很精妙,但是我这里先给出一个直觉式的暴力解法,以后有机会在不断优化。此题可以理解为,每次从list中选择最大的节点,从中剔除利用哨兵组成新的节点,然后在将链表更新,不断跌代,最后当list为空结束。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution:
+    def mergeKLists(self, lists):
+        &amp;quot;&amp;quot;&amp;quot;
+        :type lists: List[ListNode]
+        :rtype: ListNode
+        &amp;quot;&amp;quot;&amp;quot;
+        dummy = ListNode(-1)
+        cur = dummy
+        while len(lists) != 0:
+            index = self.min(lists)
+            if not lists[index]:
+                del lists[index]
+                continue
+            cur.next = lists[index]
+            if lists[index] and lists[index].next:
+                lists[index] = lists[index].next
+            else:
+                del lists[index]
+            cur = cur.next
+        return dummy.next
+    def min(self,lists):
+        m = lists[0]
+        index = 0
+        i = 1
+        while i&amp;lt;len(lists):
+            if lists[i] and m and m.val &amp;gt; lists[i].val:
+                m = lists[i]
+                index = i
+            i += 1
+        return index
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;33-删除链表中的节点-https-leetcode-cn-com-problems-delete-node-in-a-linked-list-description&#34;&gt;33.&lt;a href=&#34;https://leetcode-cn.com/problems/delete-node-in-a-linked-list/description/&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;删除链表中的节点&lt;/a&gt;&lt;/h2&gt;
+
+&lt;p&gt;思想比较巧妙,你只有给定节点,没有前驱节点的指针.巧妙的利用赋值的思想解决。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution:
+    def deleteNode(self, node):
+        &amp;quot;&amp;quot;&amp;quot;
+        :type node: ListNode
+        :rtype: void Do not return anything, modify node in-place instead.
+        &amp;quot;&amp;quot;&amp;quot;
+        tmp = node.next
+        node.next = node.next.next
+        tmp.next = None
+        node.val = tmp.val
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;34-链表的中间结点-https-leetcode-cn-com-problems-middle-of-the-linked-list-description&#34;&gt;34.&lt;a href=&#34;https://leetcode-cn.com/problems/middle-of-the-linked-list/description/&#34; rel=&#34;nofollow noreferrer&#34; target=&#34;_blank&#34;&gt;链表的中间结点&lt;/a&gt;&lt;/h2&gt;
+
+&lt;p&gt;本来按照顺序此题放在前面,后来发现居然没写,在这里加上吧。前面多次提到,中间节点,快慢指针呀&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class Solution(object):
+    def middleNode(self, head):
+        &amp;quot;&amp;quot;&amp;quot;
+        :type head: ListNode
+        :rtype: ListNode
+        &amp;quot;&amp;quot;&amp;quot;
+        if not head and not head.next:
+            return head
+        slow,fast = head,head
+        while fast and fast.next:
+            fast = fast.next.next
+            slow = slow.next
+        return slow
+&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
+    
+    <item>
+      <title>about</title>
+      <link>http://jueyoq.top/about/</link>
+      <pubDate>Wed, 29 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://jueyoq.top/about/</guid>
+      <description>
+
+&lt;h1 id=&#34;关于本站&#34;&gt;关于本站&lt;/h1&gt;
+
+&lt;p&gt;仅用于分享我各人的人生感悟与技术心得&lt;/p&gt;
+
+&lt;h1 id=&#34;关于我&#34;&gt;关于我&lt;/h1&gt;
+
+&lt;p&gt;心灵可以纵情于一只墨水瓶里,就如同置于巨大广漠的星空之下,任何生活都可以通写作进入永恒。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
