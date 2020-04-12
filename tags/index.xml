@@ -2,38 +2,38 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on 孙权</title>
-    <link>http://jueyoq.top/tags/</link>
+    <link>https://logikoisto.github.io/tags/</link>
     <description>Recent content in Tags on 孙权</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     
-	<atom:link href="http://jueyoq.top/tags/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://logikoisto.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>leetcode</title>
-      <link>http://jueyoq.top/tags/leetcode/</link>
+      <link>https://logikoisto.github.io/tags/leetcode/</link>
       <pubDate>Sat, 10 Aug 2019 00:00:00 +0000</pubDate>
       
-      <guid>http://jueyoq.top/tags/leetcode/</guid>
+      <guid>https://logikoisto.github.io/tags/leetcode/</guid>
       <description></description>
     </item>
     
     <item>
       <title>人生心得</title>
-      <link>http://jueyoq.top/tags/%E4%BA%BA%E7%94%9F%E5%BF%83%E5%BE%97/</link>
+      <link>https://logikoisto.github.io/tags/%E4%BA%BA%E7%94%9F%E5%BF%83%E5%BE%97/</link>
       <pubDate>Sat, 10 Aug 2019 00:00:00 +0000</pubDate>
       
-      <guid>http://jueyoq.top/tags/%E4%BA%BA%E7%94%9F%E5%BF%83%E5%BE%97/</guid>
+      <guid>https://logikoisto.github.io/tags/%E4%BA%BA%E7%94%9F%E5%BF%83%E5%BE%97/</guid>
       <description></description>
     </item>
     
     <item>
       <title>架构设计</title>
-      <link>http://jueyoq.top/tags/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/</link>
+      <link>https://logikoisto.github.io/tags/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/</link>
       <pubDate>Sat, 10 Aug 2019 00:00:00 +0000</pubDate>
       
-      <guid>http://jueyoq.top/tags/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/</guid>
+      <guid>https://logikoisto.github.io/tags/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/</guid>
       <description></description>
     </item>
     

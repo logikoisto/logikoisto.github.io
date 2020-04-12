@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>读书笔记 on 孙权</title>
-    <link>http://jueyoq.top/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/</link>
+    <link>https://logikoisto.github.io/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/</link>
     <description>Recent content in 读书笔记 on 孙权</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 10 Aug 2019 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="http://jueyoq.top/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://logikoisto.github.io/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>数据密集型应用系统设计-读后感</title>
-      <link>http://jueyoq.top/2019/ddia/</link>
+      <link>https://logikoisto.github.io/2019/ddia/</link>
       <pubDate>Sat, 10 Aug 2019 00:00:00 +0000</pubDate>
       
-      <guid>http://jueyoq.top/2019/ddia/</guid>
+      <guid>https://logikoisto.github.io/2019/ddia/</guid>
       <description>存储与检索的基本设计理念 本篇主要讲述我对DDIA这本书的个人理解,帮助读者更快的了解DDIA并以一种思维贯穿始终,以便可以更好的应用在实际问题当中。数据密集型系统是指,通过IO将数据进行处理的系统,而用于解决将数据进行计算分析的系统则称之为计算密集型系统,本篇主要讨论数据密集型系统
 数据系统的目标 数据密集型系统的主要指标有三个,可扩展性,可靠性,可维护性
 可扩展性 可扩展性强调数据系统可以通过增加单台机器的性能或者机器的数量来使系统的负载线性增长的一种表现。通过增加单台机器的内存,磁盘,cpu核数或者处理能力,来垂直的增加系统的负载能力可以称之为垂直扩展,而通过增加同规格机器的数量来使负载增强的方式可以称之为水平扩展。对于计算机硬件来说,单台机器的性能总是昂贵的,所以水平扩展的方式虽然在实现上更加复杂,但因其成本很低,故而被广泛采用,随着数据规模的增加,成本的考量将成为重中之重。

@@ -63,4 +63,4 @@ Disallow: /
 User-agent: ZoominfoBot
 Disallow: /
 
-Sitemap: http://jueyoq.top/sitemap.xml
+Sitemap: https://logikoisto.github.io/sitemap.xml
